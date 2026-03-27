@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4X IRAQ STORE</title>
+    <style>
+        body { background-color: #0d1117; color: white; font-family: sans-serif; margin: 0; padding: 10px; padding-top: 80px; }
+        .header { display: flex; justify-content: center; align-items: center; padding: 15px; border-bottom: 2px solid #2ea043; background: #161b22; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; }
+        .logo { font-size: 24px; font-weight: bold; cursor: pointer; }
+        .logo .x { color: #2ea043; } 
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card { background: #21262d; border: 1px solid #30363d; border-radius: 12px; overflow: hidden; position: relative; }
+        .card img { width: 100%; height: 130px; object-fit: cover; }
+        .controls { position: absolute; top: 5px; left: 5px; right: 5px; display: none; gap: 5px; z-index: 100; }
+        .edit-mode .controls { display: flex; }
+        .control-btn { border: none; color: white; border-radius: 6px; padding: 6px; font-size: 10px; cursor: pointer; flex: 1; }
+        .btn { border: none; padding: 10px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: 8px; cursor: pointer; text-decoration: none; display: inline-block; box-sizing: border-box; text-align: center; }
+        .unlocked .btn-load { background: #2ea043; color: white; display: block; }
+        .unlocked .btn-locked { display: none; }
+        .locked .btn-load { display: none; }
+        .locked .btn-locked { background: #da3633; color: white; cursor: not-allowed; display: block; }
+        .add-card-btn { display: none; background: #161b22; border: 3px dashed #2ea043 !important; border-radius: 12px; align-items: center; justify-content: center; font-size: 80px; color: #2ea043; height: 210px; cursor: pointer; z-index: 500; position: relative; }
+        .edit-mode .add-card-btn { display: flex !important; }
+        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #161b22; padding: 20px; border-radius: 15px; border: 2px solid #2ea043; z-index: 10000; width: 90%; max-width: 380px; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
+        .toggle-container { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; background: #0d1117; padding: 10px; border-radius: 8px; }
+        #statusBtn { border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; min-width: 120px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo" onclick="askPass()">
+            <span class="x">4X</span><span> IRAQ</span>
+        </div>
+    </div>
+
+    <div class="grid" id="mainGrid">
+        <div class="add-card-btn" id="plusBtn" onmousedown="openAddModal()" ontouchstart="openAddModal()">+</div>
+    </div>
+
+    <div id="modal">
+        <h3 style="text-align:center; color:#2ea043; margin:0 0 15px 0;">إدارة البيانات</h3>
+        <input type="text" id="mName" placeholder="اسم اللعبة">
+        <input type="text" id="mImg" placeholder="رابط الصورة">
+        <input type="text" id="mLink" placeholder="رابط التحميل">
+        <div class="toggle-container">
+            <span>الحالة:</span>
+            <button id="statusBtn" type="button" onclick="toggleStatusUI()">مفتوحة ✅</button>
+        </div>
+        <button id="saveBtn" class="btn" style="background:#2ea043; color:white; margin-top:20px; padding:15px;">حفظ</button>
+        <button class="btn" type="button" style="background:#30363d; color:white; margin-top:10px;" onclick="closeModal()">إلغاء</button>
+    </div>
+
+    <script>
+        let isItemUnlocked = true;
+        let currentEditId = null;
+        let items = JSON.parse(localStorage.getItem('storeItems')) || [];
+
+        function askPass() {
+            let p = prompt("أدخل الرمز:");
+            if(p === "4444") { document.body.classList.toggle('edit-mode'); }
+        }
+
+        function toggleStatusUI() {
+            isItemUnlocked = !isItemUnlocked;
+            const btn = document.getElementById('statusBtn');
+            btn.innerText = isItemUnlocked ? "مفتوحة ✅" : "مقفولة 🔒";
+            btn.style.backgroundColor = isItemUnlocked ? "#2ea043" : "#da3633";
+        }
+
+        function openAddModal() {
+            currentEditId = null;
+            isItemUnlocked = true;
+            document.getElementById('mName').value = '';
+            document.getElementById('mImg').value = '';
+            document.getElementById('mLink').value = '';
+            updateModalUI();
+            document.getElementById('saveBtn').onclick = addItem;
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function updateModalUI() {
+            const btn = document.getElementById('statusBtn');
+            btn.innerText = isItemUnlocked ? "مفتوحة ✅" : "مقفولة 🔒";
+            btn.style.backgroundColor = isItemUnlocked ? "#2ea043" : "#da3633";
+        }
+
+        function addItem() {
+            const name = document.getElementById('mName').value;
+            const img = document.getElementById('mImg').value;
+            const link = document.getElementById('mLink').value;
+            if(name && img && link) {
+                const newItem = { id: "c" + Date.now(), name, img, link, unlocked: isItemUnlocked };
+                items.push(newItem);
+                saveAndRender();
+                closeModal();
+            }
+        }
+
+        function openEditModal(id) {
+            currentEditId = id;
+            const item = items.find(i => i.id === id);
+            document.getElementById('mName').value = item.name;
+            document.getElementById('mImg').value = item.img;
+            document.getElementById('mLink').value = item.link;
+            isItemUnlocked = item.unlocked;
+            updateModalUI();
+            document.getElementById('saveBtn').onclick = saveChanges;
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function saveChanges() {
+            const index = items.findIndex(i => i.id === currentEditId);
+            items[index] = {
+                id: currentEditId,
+                name: document.getElementById('mName').value,
+                img: document.getElementById('mImg').value,
+                link: document.getElementById('mLink').value,
+                unlocked: isItemUnlocked
+            };
+            saveAndRender();
+            closeModal();
+        }
+
+        function deleteItem(id) {
+            items = items.filter(i => i.id !== id);
+            saveAndRender();
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('storeItems', JSON.stringify(items));
+            renderItems();
+        }
+
+        function renderItems() {
+            const grid = document.getElementById('mainGrid');
+            const plus = document.getElementById('plusBtn');
+            document.querySelectorAll('.card').forEach(c => c.remove());
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `card ${item.unlocked ? 'unlocked' : 'locked'}`;
+                div.id = item.id;
+                div.innerHTML = `
+                    <div class="controls">
+                        <button class="control-btn" style="background:#da3633" onclick="deleteItem('${item.id}')">حذف</button>
+                        <button class="control-btn" style="background:#0969da" onclick="openEditModal('${item.id}')">تعديل</button>
+                    </div>
+                    <img src="${item.img}">
+                    <div class="card-info" style="padding:10px; text-align:center;">
+                        <span class="card-title" style="font-weight:bold; display:block;">${item.name}</span>
+                        <a href="${item.link}" target="_blank" class="btn btn-load">تحميل 🔓</a>
+                        <button class="btn btn-locked">قريباً.. 🔒</button>
+                    </div>`;
+                grid.insertBefore(div, plus);
+            });
+        }
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        
+        // تشغيل العرض عند فتح الصفحة
+        renderItems();
+    </script>
+</body>
+</html>
