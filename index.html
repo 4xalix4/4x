@@ -3,62 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4X IRAQ | متجر الألعاب</title>
+    <title>4X IRAQ | المتجر الذكي</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        :root { --main-color: #2ecc71; --bg-dark: #0f1014; --card-bg: #1a1c23; }
-        body { background-color: var(--bg-dark); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; }
-        header { text-align: center; padding: 30px; border-bottom: 2px solid var(--main-color); margin-bottom: 30px; }
-        h1 { color: var(--main-color); margin: 0; font-size: 2.5rem; text-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
-        .games-grid { display: grid; grid-gap: 20px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); max-width: 1200px; margin: 0 auto; }
-        .game-card { background: var(--card-bg); border-radius: 15px; overflow: hidden; transition: 0.3s; border: 1px solid #333; position: relative; }
-        .game-card:hover { transform: translateY(-5px); border-color: var(--main-color); }
-        .game-img { width: 100%; height: 180px; object-fit: cover; background: #222; }
-        .game-info { padding: 15px; text-align: center; }
-        .game-title { font-size: 1.2rem; margin: 10px 0; font-weight: bold; }
-        
-        /* ستايل السعر أو كلمة مجاني */
-        .price-tag { display: inline-block; padding: 5px 15px; border-radius: 20px; margin-bottom: 15px; font-weight: bold; }
-        .price-paid { background: rgba(46, 204, 113, 0.1); color: var(--main-color); border: 1px solid var(--main-color); }
-        .price-free { background: rgba(52, 152, 219, 0.1); color: #3498db; border: 1px solid #3498db; }
-
-        .download-btn { 
-            display: block; background: var(--main-color); color: black; 
-            padding: 12px; border-radius: 8px; text-decoration: none; 
-            font-weight: bold; transition: 0.2s;
-        }
-        .download-btn:hover { box-shadow: 0 0 15px var(--main-color); opacity: 0.9; }
+        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; text-align: center; }
+        header { padding: 20px; border-bottom: 2px solid var(--main); margin-bottom: 30px; cursor: pointer; }
+        h1 { color: var(--main); margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid #333; transition: 0.3s; }
+        .card:hover { border-color: var(--main); }
+        .card img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; background: #222; }
+        .price { color: var(--main); font-weight: bold; margin: 10px 0; display: block; font-size: 1.2rem; }
+        .btn { background: var(--main); color: black; padding: 12px; border-radius: 8px; text-decoration: none; display: block; font-weight: bold; margin-top: 10px; }
+        .admin-panel { display: none; background: #222; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed var(--main); max-width: 500px; margin-left: auto; margin-right: auto; }
+        input { width: 90%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #444; background: #111; color: white; }
+        .delete-btn { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 10px; cursor: pointer; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-<header>
+<header onclick="askAdmin()">
     <h1>4X IRAQ</h1>
-    <p>أفضل الألعاب والبرامج في العراق</p>
+    <p>اضغط هنا لإضافة لعبة (للمدير فقط)</p>
 </header>
 
-<div class="games-grid">
-
-    <div class="game-card">
-        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" class="game-img">
-        <div class="game-info">
-            <div class="game-title">GTA V Premium</div>
-            <div class="price-tag price-paid">10,000 IQD</div>
-            <a href="رابط_التحميل" class="download-btn">تحميل الآن</a>
-        </div>
-    </div>
-
-    <div class="game-card">
-        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500" class="game-img">
-        <div class="game-info">
-            <div class="game-title">Minecraft PC</div>
-            <div class="price-tag price-free">مجانية تماماً</div>
-            <a href="رابط_التحميل" class="download-btn">تحميل الآن</a>
-        </div>
-    </div>
-
+<div id="adminArea" class="admin-panel">
+    <h3>إضافة لعبة جديدة</h3>
+    <input type="text" id="gTitle" placeholder="اسم اللعبة">
+    <input type="text" id="gPrice" placeholder="السعر (مثال: 5,000 IQD أو مجانية)">
+    <input type="text" id="gImg" placeholder="رابط صورة اللعبة">
+    <input type="text" id="gLink" placeholder="رابط التحميل (ميديا فاير/تليجرام)">
+    <button onclick="addGame()" style="background:var(--main); padding:10px 20px; border:none; border-radius:5px; cursor:pointer; font-weight:bold; margin-top:10px;">نشر للجميع فوراً</button>
 </div>
 
-<p style="text-align: center; color: #555; margin-top: 50px;">© 2026 4X SHOP IRAQ</p>
+<div class="grid" id="container">جاري تحميل الألعاب من السيرفر...</div>
 
+<script>
+    // الإعدادات من صورتك تم وضعها هنا بدقة
+    const firebaseConfig = {
+        apiKey: "AIzaSyDir7HCzj3n6ngfkDedeoIXHGsAK6hCPFY",
+        authDomain: "x-iraq.firebaseapp.com",
+        databaseURL: "https://x-iraq-default-rtdb.firebaseio.com/",
+        projectId: "x-iraq",
+        storageBucket: "x-iraq.appspot.com",
+        messagingSenderId: "711532790810",
+        appId: "1:711532790810:web:8989h70ba91259afaac943",
+        measurementId: "G-N2SJGLCRGN"
+    };
+    
+    // تشغيل فيربيز
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // وظيفة الدخول كمدير
+    function askAdmin() {
+        let pass = prompt("أدخل رمز الإدارة الخاص بك:");
+        if(pass === "4444") { 
+            document.getElementById('adminArea').style.display = 'block'; 
+            window.scrollTo(0,0);
+        } else {
+            alert("الرمز خطأ!");
+        }
+    }
+
+    // وظيفة إضافة لعبة للسيرفر
+    function addGame() {
+        const title = document.getElementById('gTitle').value;
+        const price = document.getElementById('gPrice').value;
+        const img = document.getElementById('gImg').value;
+        const link = document.getElementById('gLink').value;
+
+        if(title && price && img && link) {
+            db.ref('games').push({ title, price, img, link });
+            alert("تمت الإضافة! ستظهر الآن عند كل المستخدمين.");
+            document.getElementById('adminArea').style.display = 'none';
+            // مسح الحقول
+            document.getElementById('gTitle').value = '';
+            document.getElementById('gPrice').value = '';
+            document.getElementById('gImg').value = '';
+            document.getElementById('gLink').value = '';
+        } else {
+            alert("يرجى ملء جميع الحقول!");
+        }
+    }
+
+    // عرض الألعاب من السيرفر وتحديثها تلقائياً عند الجميع
+    db.ref('games').on('value', (snap) => {
+        const container = document.getElementById('container');
+        container.innerHTML = '';
+        if(!snap.exists()) { container.innerHTML = 'لا توجد ألعاب حالياً.. أضف أول لعبة!'; }
+        snap.forEach((child) => {
+            const data = child.val();
+            container.innerHTML += `
+                <div class="card">
+                    <img src="${data.img}" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
+                    <h3>${data.title}</h3>
+                    <span class="price">${data.price}</span>
+                    <a href="${data.link}" target="_blank" class="btn">تحميل الآن</a>
+                    <button onclick="deleteGame('${child.key}')" class="delete-btn">حذف اللعبة</button>
+                </div>
+            `;
+        });
+    });
+
+    // وظيفة الحذف
+    function deleteGame(key) {
+        if(confirm("هل أنت متأكد من حذف هذه اللعبة من المتجر نهائياً؟")) {
+            db.ref('games/' + key).remove();
+        }
+    }
+</script>
 </body>
 </html>
