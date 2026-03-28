@@ -3,108 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4X IRAQ | المتجر الذكي</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <title>4X IRAQ | متجر الألعاب</title>
     <style>
-        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; text-align: center; }
-        header { padding: 20px; border-bottom: 2px solid var(--main); margin-bottom: 30px; cursor: pointer; }
-        h1 { color: var(--main); margin: 0; font-size: 2.5rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .card { background: var(--card); border-radius: 15px; padding: 15px; border: 1px solid #333; transition: 0.3s; position: relative; }
-        .card:hover { border-color: var(--main); transform: translateY(-5px); }
-        .card img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; background: #222; }
-        .price { color: var(--main); font-weight: bold; margin: 10px 0; display: block; font-size: 1.2rem; }
-        .btn { background: var(--main); color: black; padding: 12px; border-radius: 8px; text-decoration: none; display: block; font-weight: bold; margin-top: 10px; }
-        .admin-panel { display: none; background: #222; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px dashed var(--main); max-width: 500px; margin: 0 auto 20px auto; }
-        input { width: 90%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; }
-        .delete-btn { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 15px; cursor: pointer; font-size: 0.8rem; width: 100%; }
+        :root { --main-color: #2ecc71; --bg-dark: #0f1014; --card-bg: #1a1c23; }
+        body { background-color: var(--bg-dark); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; }
+        header { text-align: center; padding: 20px; border-bottom: 2px solid var(--main-color); margin-bottom: 30px; }
+        h1 { color: var(--main-color); margin: 0; font-size: 2.5rem; text-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
+        
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .game-card { background: var(--card-bg); border-radius: 15px; overflow: hidden; transition: 0.3s; border: 1px solid #333; }
+        .game-card:hover { transform: translateY(-5px); border-color: var(--main-color); }
+        .game-img { width: 100%; height: 200px; object-fit: cover; background: #222; }
+        .game-info { padding: 15px; text-align: center; }
+        .game-title { font-size: 1.2rem; margin: 10px 0; font-weight: bold; }
+        .game-price { color: var(--main-color); font-size: 1.1rem; margin-bottom: 15px; display: block; }
+        
+        .download-btn { 
+            display: inline-block; background: var(--main-color); color: black; 
+            padding: 10px 25px; border-radius: 8px; text-decoration: none; 
+            font-weight: bold; transition: 0.2s; width: 80%;
+        }
+        .download-btn:hover { opacity: 0.9; box-shadow: 0 0 15px var(--main-color); }
+        
+        .footer-note { text-align: center; margin-top: 50px; color: #666; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-<header onclick="askAdmin()">
+<header>
     <h1>4X IRAQ</h1>
-    <p>اضغط هنا لإدارة المتجر (الرمز 4444)</p>
+    <p>أفضل الألعاب والبرامج في العراق</p>
 </header>
 
-<div id="adminArea" class="admin-panel">
-    <h3>إضافة لعبة جديدة</h3>
-    <input type="text" id="gTitle" placeholder="اسم اللعبة">
-    <input type="text" id="gPrice" placeholder="السعر (مثال: 5,000 IQD أو مجانية)">
-    <input type="text" id="gImg" placeholder="رابط صورة اللعبة">
-    <input type="text" id="gLink" placeholder="رابط التحميل">
-    <button onclick="addGame()" style="background:var(--main); width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; margin-top:10px;">نشر للجميع</button>
+<div class="games-grid" id="gamesContainer">
+    <div class="game-card">
+        <img src="https://via.placeholder.com/300x200?text=Minecraft" class="game-img" alt="لعبة">
+        <div class="game-info">
+            <div class="game-title">Minecraft PC</div>
+            <span class="game-price">5,000 IQD</span>
+            <a href="رابط_التحميل_هنا" class="download-btn">تحميل الآن</a>
+        </div>
+    </div>
+
+    <div class="game-card">
+        <img src="https://via.placeholder.com/300x200?text=GTA+V" class="game-img" alt="لعبة">
+        <div class="game-info">
+            <div class="game-title">GTA V Premium</div>
+            <span class="game-price">10,000 IQD</span>
+            <a href="رابط_التحميل_هنا" class="download-btn">تحميل الآن</a>
+        </div>
+    </div>
+
 </div>
 
-<div class="grid" id="container">جاري تحميل الألعاب من السيرفر...</div>
+<div class="footer-note">
+    <p>© 2026 4X SHOP IRAQ - جميع الحقوق محفوظة</p>
+</div>
 
-<script>
-    // الإعدادات المحدثة من صورتك الأخيرة
-    const firebaseConfig = {
-        apiKey: "AIzaSyDir7HCzj3n6ngfkDedeoIXHGsAK6hCPFY",
-        authDomain: "x-iraq.firebaseapp.com",
-        databaseURL: "https://x-iraq-default-rtdb.firebaseio.com/",
-        projectId: "x-iraq",
-        storageBucket: "x-iraq.appspot.com",
-        messagingSenderId: "711532790810",
-        appId: "1:711532790810:web:0989b70be91259efaac943",
-        measurementId: "G-N2SJGLCRGN"
-    };
-    
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    function askAdmin() {
-        let pass = prompt("أدخل رمز الإدارة:");
-        if(pass === "4444") { 
-            document.getElementById('adminArea').style.display = 'block';
-            window.scrollTo(0, 0);
-        }
-    }
-
-    function addGame() {
-        const title = document.getElementById('gTitle').value;
-        const price = document.getElementById('gPrice').value;
-        const img = document.getElementById('gImg').value;
-        const link = document.getElementById('gLink').value;
-
-        if(title && price && img && link) {
-            db.ref('games').push({ title, price, img, link });
-            alert("تم النشر بنجاح!");
-            document.getElementById('adminArea').style.display = 'none';
-            // تنظيف الحقول
-            document.querySelectorAll('input').forEach(i => i.value = '');
-        } else {
-            alert("يرجى ملء جميع الحقول (الاسم، السعر، الصورة، الرابط)");
-        }
-    }
-
-    // جلب البيانات وعرضها للكل
-    db.ref('games').on('value', (snap) => {
-        const container = document.getElementById('container');
-        container.innerHTML = '';
-        if(!snap.exists()) { container.innerHTML = 'المتجر فارغ حالياً، اضغط على الشعار لإضافة أول لعبة!'; }
-        snap.forEach((child) => {
-            const data = child.val();
-            container.innerHTML += `
-                <div class="card">
-                    <img src="${data.img}" onerror="this.src='https://via.placeholder.com/300x180?text=Error+Loading+Image'">
-                    <h3>${data.title}</h3>
-                    <span class="price">${data.price}</span>
-                    <a href="${data.link}" target="_blank" class="btn">تحميل الآن</a>
-                    <button onclick="deleteGame('${child.key}')" class="delete-btn">حذف نهائي</button>
-                </div>
-            `;
-        });
-    });
-
-    function deleteGame(key) {
-        if(confirm("هل تريد حذف هذه اللعبة من متجر الجميع؟")) {
-            db.ref('games/' + key).remove();
-        }
-    }
-</script>
 </body>
 </html>
