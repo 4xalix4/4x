@@ -60,7 +60,7 @@
             gap: 25px;
             max-width: 1200px;
             margin: 0 auto;
-            padding-bottom: 80px; /* مساحة عشان صندوق الاقتراحات ما يغطي الكروت */
+            padding-bottom: 80px;
         }
         .card {
             background-color: var(--card);
@@ -82,11 +82,11 @@
         }
         .download-btn:hover { background: var(--main); color: black; }
 
-        /* ستايل صندوق الاقتراحات والدعم بالزاوية */
+        /* صندوق الاقتراحات أسفل اليسار */
         .support-widget {
             position: fixed;
             bottom: 20px;
-            left: 20px; /* بالزاوية أسفل اليسار */
+            left: 20px;
             z-index: 1000;
         }
         .support-btn {
@@ -156,21 +156,21 @@
     </div>
 
     <script>
-        // ضع إعدادات الفايربيس الخاصة بمشروعك هنا
+        // ربط إعدادات مشروعك الحقيقي 4x-iraq مباشرة من الصورة
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyDlR7HCZj3nDngFkDEdeoIXHGsAK6hCPFY",
+            authDomain: "x-iraq.firebaseapp.com",
+            databaseURL: "https://x-iraq-default-rtdb.firebaseio.com",
+            projectId: "x-iraq",
+            storageBucket: "x-iraq.firebaseimagesstorage.app",
+            messagingSenderId: "711532790010",
+            appId: "1:711532790010:web:0989b70be91259efaac943"
         };
         
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // جلب الألعاب
+        // جلب وعرض الألعاب
         function fetchGames() {
             const grid = document.getElementById('gamesGrid');
             database.ref('games').on('value', (snapshot) => {
@@ -190,7 +190,7 @@
                             </div>`;
                     });
                 } else {
-                    grid.innerHTML = '<p>لا توجد ألعاب مضافة حالياً.</p>';
+                    grid.innerHTML = '<p>لا توجد ألعاب مضافة حالياً. سجل دخولك كأدمن وأضف أول لعبة!</p>';
                 }
             }, (error) => {
                 grid.innerHTML = '<p style="color:red;">خطأ في جلب البيانات: ' + error.message + '</p>';
@@ -234,13 +234,11 @@
             });
         }
 
-        // إخفاء وإظهار صندوق الاقتراحات
         function toggleSupportBox() {
             const box = document.getElementById('supportBox');
             box.style.display = (box.style.display === 'block') ? 'none' : 'block';
         }
 
-        // إرسال الاقتراحات أو المشاكل للفايربيس
         function sendSuggestion() {
             const name = document.getElementById('supportName').value || "زائر مجهول";
             const text = document.getElementById('supportText').value;
@@ -252,9 +250,9 @@
                 message: text,
                 timestamp: new Date().toISOString()
             }).then(() => {
-                alert("شكراً لك! تم إرسال اقتراحك/مشكلتك بنجاح.");
+                alert("شكراً لك! تم إرسال اقتراحك بنجاح.");
                 document.getElementById('supportText').value = '';
-                toggleSupportBox(); // إغلاق الصندوق بعد الإرسال
+                toggleSupportBox();
             }).catch(err => {
                 alert("فشل الإرسال: " + err.message);
             });
