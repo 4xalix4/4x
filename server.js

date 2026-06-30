@@ -1,0 +1,57 @@
+const express = require('express');
+const app = express();
+const path = require('path');
+const session = require('express-session');
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// نظام الجلسات لحماية لوحة تحكم الأدمن
+app.use(session({
+    secret: '4x-iraq-secret-key',
+    resave: false,
+    saveUninitialized: true
+}));
+
+// قائمة الألعاب الافتراضية
+let games = [
+    { id: 1, title: "GTA V - Premium Edition", size: "95 GB", link: "#", image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500" },
+    { id: 2, title: "Cyberpunk 2077", size: "70 GB", link: "#", image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=500" }
+];
+
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "4x1234"; // تقدر تغير الرمز مالتك منا بعدين
+
+// روابط الـ API لجلب وإضافة الألعاب
+app.get('/api/games', (req, res) => {
+    res.json({ success: true, data: games });
+});
+
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        req.session.isAdmin = true;
+        res.json({ success: true, message: "تم تسجيل الدخول بنجاح!" });
+    } else {
+        res.status(401).json({ success: false, message: "اسم المستخدم أو الرمز خطأ" });
+    }
+});
+
+app.post('/api/games/add', (req, res) => {
+    if (!req.session.isAdmin) return res.status(403).json({ success: false, message: "غير مسموح لك!" });
+    
+    const { title, size, link, image } = req.body;
+    const newGame = {
+        id: games.length + 1,
+        title,
+        size,
+        link,
+        image: image || "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500"
+    };
+    games.unshift(newGame);
+    res.json({ success: true, message: "تمت إضافة اللعبة بنجاح!" });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 السيرفر شغال على بورت ${PORT}`));
