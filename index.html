@@ -22,7 +22,7 @@
         .download-btn { display: inline-block; width: 100%; padding: 10px 0; background: transparent; border: 2px solid var(--main); color: var(--main); text-decoration: none; border-radius: 5px; font-weight: bold; }
         .support-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
         .support-btn { background: var(--main); color: black; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        .support-box { display: none; width: 280px; background: var(--card); border: 1px solid var(--main); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+        .support-box { display: none; width: 290px; background: var(--card); border: 1px solid var(--main); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -42,18 +42,20 @@
 
     <div class="grid" id="gamesGrid"><p>جاري التحميل...</p></div>
 
+    <!-- صندوق الدعم المادي المطور -->
     <div class="support-widget">
         <div class="support-box" id="supportBox">
-            <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">💡 ادعم استمرار المتجر</h4>
-            <p style="font-size: 9pt; color: #ccc;">
-                💰 <b>زين كاش:</b> 077xxxxxxxx <br>
-                📱 <b>آسيا حوالة:</b> 077xxxxxxxx <br>
-                💬 <i>أرسل كود الرصيد أو استفسارك هنا:</i>
+            <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">💡 طرق الدعم المادي للمتجر</h4>
+            <p style="font-size: 10pt; color: #e2e8f0; line-height: 1.6; margin: 0 0 10px 0;">
+                💳 <b>سوبر كي:</b> 1368224570 <br>
+                💰 <b>زين كاش:</b> اكتب_رقمك_هنا <br>
+                📱 <b>آسيا سيل:</b> اكتب_رقمك_هنا <br>
+                📌 <i>أو أرسل كود كارت الشحن بالأسفل:</i>
             </p>
-            <div class="form-group"><input type="text" id="supportText" placeholder="اكتب هنا..."></div>
-            <button class="btn" style="width: 100%;" onclick="sendSuggestion()">إرسال</button>
+            <div class="form-group"><input type="text" id="supportText" placeholder="اكتب اقتراحك أو كود الرصيد هنا..."></div>
+            <button class="btn" style="width: 100%;" onclick="sendSuggestion()">إرسال فوراً</button>
         </div>
-        <button class="support-btn" onclick="toggleSupportBox()">💬 الدعم المادي</button>
+        <button class="support-btn" onclick="toggleSupportBox()">💬 الدعم والاقتراحات</button>
     </div>
 
     <script>
@@ -99,13 +101,16 @@
             if(title && link) {
                 database.ref('games').push().set({ title, size, link });
                 alert("تمت الإضافة!");
+                document.getElementById('gameTitle').value = '';
+                document.getElementById('gameSize').value = '';
+                document.getElementById('gameLink').value = '';
             }
         }
 
         function toggleSupportBox() { const box = document.getElementById('supportBox'); box.style.display = (box.style.display === 'block') ? 'none' : 'block'; }
         function sendSuggestion() {
             const text = document.getElementById('supportText').value;
-            if(text) { database.ref('suggestions').push().set({ message: text }); alert("تم الإرسال!"); document.getElementById('supportText').value = ''; }
+            if(text) { database.ref('suggestions').push().set({ message: text, timestamp: new Date().toISOString() }); alert("تم الإرسال بنجاح! شكراً لك."); document.getElementById('supportText').value = ''; }
         }
         window.onload = fetchGames;
     </script>
