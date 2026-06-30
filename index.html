@@ -7,118 +7,56 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        :root {
-            --main: #2ecc71;
-            --bg: #0f1014;
-            --card: #1a1c23;
-            --text: #e2e8f0;
-        }
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            border-bottom: 2px solid var(--main);
-            margin-bottom: 30px;
-        }
+        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; --text: #e2e8f0; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; min-height: 100vh; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 2px solid var(--main); margin-bottom: 30px; }
         header h1 { color: var(--main); margin: 0; font-size: 20pt; }
-        .btn {
-            background: var(--main);
-            color: #000;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .admin-section {
-            background: var(--card);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border: 1px solid #334155;
-            display: none;
-        }
+        .btn { background: var(--main); color: #000; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .admin-section { background: var(--card); padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #334155; display: none; }
         .form-group { margin-bottom: 15px; }
-        .form-group input {
-            width: 100%; padding: 10px; background: #0b0f19;
-            border: 1px solid #334155; color: white; border-radius: 5px; box-sizing: border-box;
-            font-family: inherit;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding-bottom: 80px;
-        }
-        .card {
-            background-color: var(--card);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            border: 1px solid #232731;
-        }
+        .form-group input { width: 100%; padding: 10px; background: #0b0f19; border: 1px solid #334155; color: white; border-radius: 5px; box-sizing: border-box; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
+        .card { background-color: var(--card); border-radius: 8px; border: 1px solid #232731; overflow: hidden; }
         .card img { width: 100%; height: 160px; object-fit: cover; }
         .card-body { padding: 15px; text-align: center; }
-        .card-body h3 { margin: 10px 0; font-size: 14pt; }
-        .card-body p { color: #94a3b8; font-size: 11pt; margin-bottom: 15px; }
-        .download-btn {
-            display: inline-block; width: 100%; padding: 10px 0;
-            background: transparent; border: 2px solid var(--main);
-            color: var(--main); text-decoration: none; border-radius: 5px; font-weight: bold;
-        }
-        .download-btn:hover { background: var(--main); color: black; }
-
-        /* صندوق الاقتراحات */
+        .download-btn { display: inline-block; width: 100%; padding: 10px 0; background: transparent; border: 2px solid var(--main); color: var(--main); text-decoration: none; border-radius: 5px; font-weight: bold; }
         .support-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
         .support-btn { background: var(--main); color: black; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        .support-box { display: none; width: 300px; background: var(--card); border: 1px solid var(--main); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+        .support-box { display: none; width: 280px; background: var(--card); border: 1px solid var(--main); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>🎮 4X IRAQ</h1>
-        <button class="btn" id="loginBtn" onclick="toggleAdminPanel()">لوحة التحكم (الأدمن)</button>
+        <button class="btn" onclick="checkAdminPassword()">لوحة التحكم</button>
     </header>
 
     <section id="adminPanel" class="admin-section">
-        <h2 style="color: var(--main); margin-top:0;">إضافة لعبة جديدة للموقع</h2>
-        <div id="addGameForm">
-            <div class="form-group"><input type="text" id="gameTitle" placeholder="اسم اللعبة (مثال: GTA V)"></div>
-            <div class="form-group"><input type="text" id="gameSize" placeholder="حجم اللعبة (مثال: 60 GB)"></div>
-            <div class="form-group"><input type="text" id="gameImage" placeholder="رابط صورة اللعبة (اختياري)"></div>
-            <div class="form-group"><input type="text" id="gameLink" placeholder="رابط تحميل اللعبة"></div>
-            <button class="btn" onclick="addGame()">إضافة اللعبة فوراً 🚀</button>
-        </div>
+        <h2 style="color: var(--main); margin-top:0;">إضافة لعبة</h2>
+        <div class="form-group"><input type="text" id="gameTitle" placeholder="اسم اللعبة"></div>
+        <div class="form-group"><input type="text" id="gameSize" placeholder="الحجم"></div>
+        <div class="form-group"><input type="text" id="gameLink" placeholder="رابط التحميل"></div>
+        <button class="btn" onclick="addGame()">إضافة للـ Database</button>
     </section>
 
-    <h2 style="text-align: center; margin-bottom: 25px;">الألعاب المتوفرة للتحميل</h2>
-    <div class="grid" id="gamesGrid">
-        <p>جاري تحميل الألعاب من قاعدة البيانات...</p>
-    </div>
+    <div class="grid" id="gamesGrid"><p>جاري التحميل...</p></div>
 
     <div class="support-widget">
         <div class="support-box" id="supportBox">
-            <h4 style="margin:0 0 10px 0; color:var(--main);">💡 صندوق الاقتراحات</h4>
-            <div class="form-group"><input type="text" id="supportText" placeholder="اكتب اقتراحك هنا..."></div>
+            <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">💡 ادعم استمرار المتجر</h4>
+            <p style="font-size: 9pt; color: #ccc;">
+                💰 <b>زين كاش:</b> 077xxxxxxxx <br>
+                📱 <b>آسيا حوالة:</b> 077xxxxxxxx <br>
+                💬 <i>أرسل كود الرصيد أو استفسارك هنا:</i>
+            </p>
+            <div class="form-group"><input type="text" id="supportText" placeholder="اكتب هنا..."></div>
             <button class="btn" style="width: 100%;" onclick="sendSuggestion()">إرسال</button>
         </div>
-        <button class="support-btn" onclick="toggleSupportBox()">💬 الاقتراحات</button>
+        <button class="support-btn" onclick="toggleSupportBox()">💬 الدعم المادي</button>
     </div>
 
     <script>
-        // ربط إعدادات الفايربيس مالتك الحقيقية
         const firebaseConfig = {
             apiKey: "AIzaSyDlR7HCZj3nDngFkDEdeoIXHGsAK6hCPFY",
             authDomain: "x-iraq.firebaseapp.com",
@@ -128,84 +66,47 @@
             messagingSenderId: "711532790010",
             appId: "1:711532790010:web:0989b70be91259efaac943"
         };
-        
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        let isAdminLoggedIn = false;
 
-        // جلب وعرض الألعاب (تحديث لقراءة الحجم القديم والجديد)
+        function checkAdminPassword() {
+            if (isAdminLoggedIn) { document.getElementById('adminPanel').style.display = (document.getElementById('adminPanel').style.display === 'block') ? 'none' : 'block'; return; }
+            const password = prompt("أدخل رمز الأمان:");
+            if (password === "4x2026") { isAdminLoggedIn = true; document.getElementById('adminPanel').style.display = "block"; }
+            else if (password !== null) alert("رمز خاطئ!");
+        }
+
         function fetchGames() {
-            const grid = document.getElementById('gamesGrid');
             database.ref('games').on('value', (snapshot) => {
+                const grid = document.getElementById('gamesGrid');
                 const data = snapshot.val();
                 if(data) {
                     grid.innerHTML = '';
                     Object.keys(data).reverse().forEach(key => {
                         const game = data[key];
-                        // التحقق من اسم حقل الحجم عشان ما يطلع undefined
-                        const displaySize = game.size || game.gameSize || "غير محدد";
-                        grid.innerHTML += `
-                            <div class="card">
-                                <img src="${game.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500'}" alt="${game.title}">
-                                <div class="card-body">
-                                    <h3>${game.title}</h3>
-                                    <p>الحجم: ${displaySize}</p>
-                                    <a href="${game.link}" class="download-btn" target="_blank">تحميل</a>
-                                </div>
-                            </div>`;
+                        grid.innerHTML += `<div class="card"><div class="card-body"><h3>${game.title}</h3><p>الحجم: ${game.size || 'غير محدد'}</p><a href="${game.link}" class="download-btn" target="_blank">تحميل</a></div></div>`;
                     });
-                } else {
-                    grid.innerHTML = '<p>لا توجد ألعاب مضافة حالياً.</p>';
                 }
             });
         }
 
-        function toggleAdminPanel() {
-            const panel = document.getElementById('adminPanel');
-            panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
-        }
-
         function addGame() {
+            if (!isAdminLoggedIn) return;
             const title = document.getElementById('gameTitle').value;
             const size = document.getElementById('gameSize').value;
-            const image = document.getElementById('gameImage').value;
             const link = document.getElementById('gameLink').value;
-
-            if(!title || !link) return alert("يرجى كتابة الاسم والرابط على الأقل!");
-
-            database.ref('games').push().set({
-                title: title,
-                size: size || "غير محدد",
-                link: link,
-                image: image || "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500"
-            }).then(() => {
-                alert("تمت إضافة اللعبة للموقع فوراً وبنجاح! 🎉");
-                document.getElementById('gameTitle').value = '';
-                document.getElementById('gameSize').value = '';
-                document.getElementById('gameImage').value = '';
-                document.getElementById('gameLink').value = '';
-            }).catch(err => {
-                alert("فشلت الإضافة: " + err.message);
-            });
+            if(title && link) {
+                database.ref('games').push().set({ title, size, link });
+                alert("تمت الإضافة!");
+            }
         }
 
-        function toggleSupportBox() {
-            const box = document.getElementById('supportBox');
-            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
-        }
-
+        function toggleSupportBox() { const box = document.getElementById('supportBox'); box.style.display = (box.style.display === 'block') ? 'none' : 'block'; }
         function sendSuggestion() {
             const text = document.getElementById('supportText').value;
-            if(!text) return alert("اكتب شيئاً أولاً!");
-            database.ref('suggestions').push().set({
-                message: text,
-                timestamp: new Date().toISOString()
-            }).then(() => {
-                alert("شكراً لك! تم الإرسال.");
-                document.getElementById('supportText').value = '';
-                toggleSupportBox();
-            });
+            if(text) { database.ref('suggestions').push().set({ message: text }); alert("تم الإرسال!"); document.getElementById('supportText').value = ''; }
         }
-
         window.onload = fetchGames;
     </script>
 </body>
