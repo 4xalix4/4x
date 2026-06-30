@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4X IRAQ | المتجر الذكي للألعاب</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         :root {
             --main: #2ecc71;
@@ -17,6 +19,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
+            position: relative;
+            min-height: 100vh;
         }
         header {
             display: flex;
@@ -45,9 +49,10 @@
             display: none;
         }
         .form-group { margin-bottom: 15px; }
-        .form-group input {
+        .form-group input, .form-group textarea {
             width: 100%; padding: 10px; background: #0b0f19;
             border: 1px solid #334155; color: white; border-radius: 5px; box-sizing: border-box;
+            font-family: inherit;
         }
         .grid {
             display: grid;
@@ -55,6 +60,7 @@
             gap: 25px;
             max-width: 1200px;
             margin: 0 auto;
+            padding-bottom: 80px; /* مساحة عشان صندوق الاقتراحات ما يغطي الكروت */
         }
         .card {
             background-color: var(--card);
@@ -75,6 +81,36 @@
             color: var(--main); text-decoration: none; border-radius: 5px; font-weight: bold;
         }
         .download-btn:hover { background: var(--main); color: black; }
+
+        /* ستايل صندوق الاقتراحات والدعم بالزاوية */
+        .support-widget {
+            position: fixed;
+            bottom: 20px;
+            left: 20px; /* بالزاوية أسفل اليسار */
+            z-index: 1000;
+        }
+        .support-btn {
+            background: var(--main);
+            color: black;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+            font-size: 11pt;
+        }
+        .support-box {
+            display: none;
+            width: 300px;
+            background: var(--card);
+            border: 1px solid var(--main);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .support-box h4 { margin: 0 0 10px 0; color: var(--main); }
     </style>
 </head>
 <body>
@@ -102,21 +138,50 @@
 
     <h2 style="text-align: center; margin-bottom: 25px;">الألعاب المتوفرة للتحميل</h2>
     <div class="grid" id="gamesGrid">
-        <p>جاري تحميل الألعاب...</p>
+        <p id="statusText">جاري تحميل الألعاب من قاعدة البيانات...</p>
+    </div>
+
+    <div class="support-widget">
+        <div class="support-box" id="supportBox">
+            <h4>💡 صندوق الدعم والاقتراحات</h4>
+            <div class="form-group">
+                <input type="text" id="supportName" placeholder="اسمك (اختياري)">
+            </div>
+            <div class="form-group">
+                <textarea id="supportText" rows="3" placeholder="اكتب اقتراحك، مشكلتك أو كلمتك هنا..." required></textarea>
+            </div>
+            <button class="btn" style="width: 100%;" onclick="sendSuggestion()">إرسال</button>
+        </div>
+        <button class="support-btn" onclick="toggleSupportBox()">💬 تواصل معنا / اقتراح</button>
     </div>
 
     <script>
-        async function fetchGames() {
+        // ضع إعدادات الفايربيس الخاصة بمشروعك هنا
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // جلب الألعاب
+        function fetchGames() {
             const grid = document.getElementById('gamesGrid');
-            try {
-                const res = await fetch('/api/games');
-                const result = await res.json();
-                if(result.success && result.data.length > 0) {
+            database.ref('games').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
                     grid.innerHTML = '';
-                    result.data.forEach(game => {
+                    Object.keys(data).reverse().forEach(key => {
+                        const game = data[key];
                         grid.innerHTML += `
                             <div class="card">
-                                <img src="${game.image}" alt="${game.title}">
+                                <img src="${game.image || 'https://via.placeholder.com/300x180'}" alt="${game.title}">
                                 <div class="card-body">
                                     <h3>${game.title}</h3>
                                     <p>الحجم: ${game.size}</p>
@@ -127,57 +192,72 @@
                 } else {
                     grid.innerHTML = '<p>لا توجد ألعاب مضافة حالياً.</p>';
                 }
-            } catch (err) {
-                grid.innerHTML = '<p style="color:red;">فشل في تحميل الألعاب من السيرفر.</p>';
-            }
+            }, (error) => {
+                grid.innerHTML = '<p style="color:red;">خطأ في جلب البيانات: ' + error.message + '</p>';
+            });
         }
 
         function showLoginModal() {
             document.getElementById('adminPanel').style.display = 'block';
         }
 
-        async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({username, password})
-            });
-            const result = await res.json();
-            if(result.success) {
+        function login() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            if (user === "admin" && pass === "4x1234") {
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('addGameForm').style.display = 'block';
                 document.getElementById('panelTitle').innerText = "لوحة إضافة الألعاب";
                 document.getElementById('loginBtn').style.display = 'none';
             } else {
-                alert(result.message);
+                alert("اسم المستخدم أو كلمة المرور خطأ!");
             }
         }
 
-        async function addGame() {
+        function addGame() {
             const title = document.getElementById('gameTitle').value;
             const size = document.getElementById('gameSize').value;
             const image = document.getElementById('gameImage').value;
             const link = document.getElementById('gameLink').value;
 
-            const res = await fetch('/api/games/add', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({title, size, image, link})
-            });
-            const result = await res.json();
-            if(result.success) {
-                alert(result.message);
-                fetchGames();
+            if(!title || !link) return alert("يرجى ملء الاسم والرابط!");
+
+            database.ref('games').push().set({
+                title, size, link,
+                image: image || "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500"
+            }).then(() => {
+                alert("تمت الإضافة بنجاح!");
                 document.getElementById('gameTitle').value = '';
                 document.getElementById('gameSize').value = '';
                 document.getElementById('gameImage').value = '';
                 document.getElementById('gameLink').value = '';
-            } else {
-                alert(result.message);
-            }
+            });
+        }
+
+        // إخفاء وإظهار صندوق الاقتراحات
+        function toggleSupportBox() {
+            const box = document.getElementById('supportBox');
+            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // إرسال الاقتراحات أو المشاكل للفايربيس
+        function sendSuggestion() {
+            const name = document.getElementById('supportName').value || "زائر مجهول";
+            const text = document.getElementById('supportText').value;
+
+            if(!text) return alert("يرجى كتابة رسالتك أولاً!");
+
+            database.ref('suggestions').push().set({
+                username: name,
+                message: text,
+                timestamp: new Date().toISOString()
+            }).then(() => {
+                alert("شكراً لك! تم إرسال اقتراحك/مشكلتك بنجاح.");
+                document.getElementById('supportText').value = '';
+                toggleSupportBox(); // إغلاق الصندوق بعد الإرسال
+            }).catch(err => {
+                alert("فشل الإرسال: " + err.message);
+            });
         }
 
         window.onload = fetchGames;
