@@ -7,25 +7,54 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; --text: #e2e8f0; }
+        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; --text: #e2e8f0; --danger: #e74c3c; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; min-height: 100vh; }
+        
+        /* شاشة الترحيب */
+        .welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #090a0f; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; transition: all 0.5s ease; }
+        .welcome-screen h1 { color: var(--main); font-size: 35pt; margin-bottom: 10px; text-shadow: 0 0 15px rgba(46, 204, 113, 0.4); }
+        .welcome-screen p { color: #a1a1a1; font-size: 14pt; margin-bottom: 25px; }
+
         header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 2px solid var(--main); margin-bottom: 30px; }
         header h1 { color: var(--main); margin: 0; font-size: 20pt; }
         .btn { background: var(--main); color: #000; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
         .admin-section { background: var(--card); padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #334155; display: none; }
         .form-group { margin-bottom: 15px; }
-        .form-group input { width: 100%; padding: 10px; background: #0b0f19; border: 1px solid #334155; color: white; border-radius: 5px; box-sizing: border-box; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; background: #0b0f19; border: 1px solid #334155; color: white; border-radius: 5px; box-sizing: border-box; font-family: inherit; }
+        
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
-        .card { background-color: var(--card); border-radius: 8px; border: 1px solid #232731; overflow: hidden; position: relative; }
-        .card-body { padding: 15px; text-align: center; }
-        .download-btn { display: inline-block; width: 100%; padding: 10px 0; background: transparent; border: 2px solid var(--main); color: var(--main); text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
-        .delete-btn { display: none; width: 100%; padding: 8px 0; background: #e74c3c; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        
+        /* كارت اللعبة المطور */
+        .card { background-color: var(--card); border-radius: 10px; border: 1px solid #232731; overflow: hidden; position: relative; display: flex; flex-direction: column; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .card img { width: 100%; height: 170px; object-fit: cover; background: #111; }
+        .card-body { padding: 15px; text-align: center; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-body h3 { margin: 10px 0 5px 0; font-size: 14pt; color: white; }
+        .card-body .size-info { color: #94a3b8; font-size: 10pt; margin-bottom: 15px; }
+        
+        /* شارات نوع اللعبة */
+        .badge { position: absolute; top: 10px; right: 10px; padding: 4px 10px; border-radius: 4px; font-size: 9pt; font-weight: bold; color: black; }
+        .badge.free { background: var(--main); }
+        .badge.paid { background: #f1c40f; }
+
+        .download-btn { display: inline-block; width: 100%; padding: 10px 0; background: transparent; border: 2px solid var(--main); color: var(--main); text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: auto; }
+        .download-btn:hover { background: var(--main); color: black; }
+        .delete-btn { display: none; width: 100%; padding: 8px 0; background: var(--danger); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        
         .support-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
         .support-btn { background: var(--main); color: black; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; }
         .support-box { display: none; width: 290px; background: var(--card); border: 1px solid var(--main); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
+
+    <!-- واجهة الترحيب الفخمة للزائر الجديد -->
+    <div class="welcome-screen" id="welcomeScreen" style="display: none;">
+        <h1>🎮 4X IRAQ</h1>
+        <p>أهلاً بك في المتجر الذكي للألعاب والخدمات</p>
+        <button class="btn" style="padding: 12px 30px; font-size: 12pt;" onclick="closeWelcomeScreen()">دخول المتجر 🚀</button>
+    </div>
 
     <header>
         <h1>🎮 4X IRAQ</h1>
@@ -34,14 +63,23 @@
 
     <section id="adminPanel" class="admin-section">
         <h2 style="color: var(--main); margin-top:0;">إضافة لعبة جديدة</h2>
-        <div class="form-group"><input type="text" id="gameTitle" placeholder="اسم اللعبة"></div>
-        <div class="form-group"><input type="text" id="gameSize" placeholder="الحجم"></div>
-        <div class="form-group"><input type="text" id="gameLink" placeholder="رابط التحميل"></div>
-        <button class="btn" onclick="addGame()">إضافة للـ Database</button>
+        <div class="form-group"><input type="text" id="gameTitle" placeholder="اسم اللعبة (مثال: Minecraft)"></div>
+        <div class="form-group"><input type="text" id="gameSize" placeholder="الحجم (مثال: 1.5 GB)"></div>
+        <div class="form-group"><input type="text" id="gameImage" placeholder="رابط صورة اللعبة (ضع رابط الصورة هنا)"></div>
+        <div class="form-group"><input type="text" id="gameLink" placeholder="رابط التحميل (أي رابط تريد)"></div>
+        <div class="form-group">
+            <select id="gameType">
+                <option value="free">مجانية (Free)</option>
+                <option value="paid">مدفوعة (Paid)</option>
+            </select>
+        </div>
+        <button class="btn" onclick="addGame()">إضافة للموقع فوراً 🚀</button>
     </section>
 
-    <div class="grid" id="gamesGrid"><p>جاري التحميل...</p></div>
+    <h2 style="text-align: center; margin-bottom: 25px;">الألعاب المتوفرة للتحميل</h2>
+    <div class="grid" id="gamesGrid"><p style="text-align: center;">جاري جلب الألعاب المضافة...</p></div>
 
+    <!-- صندوق الدعم المادي والاقتراحات -->
     <div class="support-widget">
         <div class="support-box" id="supportBox">
             <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">💡 طرق الدعم المادي للمتجر</h4>
@@ -71,25 +109,36 @@
         const database = firebase.database();
         let isAdminLoggedIn = false;
 
+        // فحص ظهور شاشة الترحيب
+        function checkWelcomeScreen() {
+            if (!localStorage.getItem('welcomed_4x')) {
+                document.getElementById('welcomeScreen').style.display = 'flex';
+            }
+        }
+        function closeWelcomeScreen() {
+            document.getElementById('welcomeScreen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('welcomeScreen').style.display = 'none';
+                localStorage.setItem('welcomed_4x', 'true');
+            }, 500);
+        }
+
         function checkAdminPassword() {
             if (isAdminLoggedIn) { 
                 document.getElementById('adminPanel').style.display = (document.getElementById('adminPanel').style.display === 'block') ? 'none' : 'block'; 
                 return; 
             }
-            const password = prompt("أدخل رمز الأمان:");
+            const password = prompt("أدخل رمز الأمان الخاص بك:");
             if (password === "4x2026") { 
                 isAdminLoggedIn = true; 
                 document.getElementById('adminPanel').style.display = "block";
-                updateDeleteButtonsVisibility(); // إظهار أزرار الحذف فوراً بعد تسجيل الدخول
+                updateDeleteButtonsVisibility();
             }
-            else if (password !== null) alert("رمز خاطئ!");
+            else if (password !== null) alert("الرمز السري خاطئ!");
         }
 
         function updateDeleteButtonsVisibility() {
-            const deleteButtons = document.querySelectorAll('.delete-btn');
-            deleteButtons.forEach(btn => {
-                btn.style.display = isAdminLoggedIn ? 'block' : 'none';
-            });
+            document.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = isAdminLoggedIn ? 'block' : 'none');
         }
 
         function fetchGames() {
@@ -101,18 +150,27 @@
                     Object.keys(data).reverse().forEach(key => {
                         const game = data[key];
                         const showDelete = isAdminLoggedIn ? 'style="display:block;"' : '';
+                        
+                        // تحديد الشارة ونوع اللعبة
+                        const typeBadge = game.type === 'paid' ? '<span class="badge paid">مدفوعة</span>' : '<span class="badge free">مجانية</span>';
+                        // صورة افتراضية في حال لم يضع الأدمن رابط صورة
+                        const defaultImg = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500";
+                        const gameImg = game.image && game.image.trim() !== "" ? game.image : defaultImg;
+
                         grid.innerHTML += `
                             <div class="card" id="card-${key}">
+                                ${typeBadge}
+                                <img src="${gameImg}" alt="${game.title}">
                                 <div class="card-body">
                                     <h3>${game.title}</h3>
-                                    <p>الحجم: ${game.size || 'غير محدد'}</p>
-                                    <a href="${game.link}" class="download-btn" target="_blank">تحميل</a>
+                                    <div class="size-info">الحجم: ${game.size || 'غير محدد'}</div>
+                                    <a href="${game.link}" class="download-btn" target="_blank">تحميل اللعبة</a>
                                     <button class="delete-btn" ${showDelete} onclick="deleteGame('${key}')">حذف اللعبة ❌</button>
                                 </div>
                             </div>`;
                     });
                 } else {
-                    grid.innerHTML = '<p style="text-align:center; color:#a1a1a1;">لا توجد ألعاب متوفرة حالياً.</p>';
+                    grid.innerHTML = '<p style="text-align:center; color:#a1a1a1;">لا توجد ألعاب مضافة حالياً.</p>';
                 }
             });
         }
@@ -121,24 +179,28 @@
             if (!isAdminLoggedIn) return;
             const title = document.getElementById('gameTitle').value;
             const size = document.getElementById('gameSize').value;
+            const image = document.getElementById('gameImage').value;
             const link = document.getElementById('gameLink').value;
+            const type = document.getElementById('gameType').value;
+
             if(title && link) {
-                database.ref('games').push().set({ title, size, link });
-                alert("تمت إضافة اللعبة بنجاح!");
+                database.ref('games').push().set({ title, size, image, link, type });
+                alert("تم رفع اللعبة للمتجر بنجاح! 🎉");
                 document.getElementById('gameTitle').value = '';
                 document.getElementById('gameSize').value = '';
+                document.getElementById('gameImage').value = '';
                 document.getElementById('gameLink').value = '';
             } else {
-                alert("يرجى ملء اسم اللعبة والرابط على الأقل!");
+                alert("يرجى كتابة اسم اللعبة ورابط التحميل على الأقل!");
             }
         }
 
         function deleteGame(gameId) {
             if (!isAdminLoggedIn) return;
-            if (confirm("هل أنت متأكد من رغبتك في حذف هذه اللعبة نهائياً من المتجر؟")) {
+            if (confirm("هل تريد حذف هذه اللعبة بشكل نهائي؟")) {
                 database.ref('games/' + gameId).remove()
-                    .then(() => alert("تم حذف اللعبة بنجاح!"))
-                    .catch((error) => alert("حدث خطأ أثناء الحذف: " + error.message));
+                    .then(() => alert("تم الحذف بنجاح!"))
+                    .catch((error) => alert("فشل الحذف: " + error.message));
             }
         }
 
@@ -147,7 +209,11 @@
             const text = document.getElementById('supportText').value;
             if(text) { database.ref('suggestions').push().set({ message: text, timestamp: new Date().toISOString() }); alert("تم الإرسال بنجاح! شكراً لك."); document.getElementById('supportText').value = ''; }
         }
-        window.onload = fetchGames;
+        
+        window.onload = function() {
+            checkWelcomeScreen();
+            fetchGames();
+        };
     </script>
 </body>
 </html>
