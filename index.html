@@ -7,7 +7,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; --text: #e2e8f0; --danger: #e74c3c; }
+        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; --text: #e2e8f0; --danger: #e74c3c; --blue: #3498db; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; min-height: 100vh; }
         
         /* شاشة الترحيب */
@@ -38,9 +38,16 @@
         .badge.free { background: var(--main); }
         .badge.paid { background: #f1c40f; }
 
-        .download-btn { display: inline-block; width: 100%; padding: 10px 0; background: transparent; border: 2px solid var(--main); color: var(--main); text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: auto; }
+        .download-btn { display: inline-block; width: 100%; padding: 10px 0; background: transparent; border: 2px solid var(--main); color: var(--main); text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: auto; cursor: pointer; text-align: center; }
         .download-btn:hover { background: var(--main); color: black; }
-        .delete-btn { display: none; width: 100%; padding: 8px 0; background: var(--danger); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        
+        .buy-btn { display: inline-block; width: 100%; padding: 10px 0; background: #f1c40f; border: 2px solid #f1c40f; color: black; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: auto; cursor: pointer; text-align: center; }
+        .buy-btn:hover { background: transparent; color: #f1c40f; }
+
+        /* أزرار التحكم للأدمن */
+        .admin-actions { display: none; margin-top: 10px; gap: 8px; }
+        .edit-btn { flex: 1; padding: 8px 0; background: var(--blue); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .delete-btn { flex: 1; padding: 8px 0; background: var(--danger); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
         
         .support-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
         .support-btn { background: var(--main); color: black; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; }
@@ -62,21 +69,24 @@
     </header>
 
     <section id="adminPanel" class="admin-section">
-        <h2 style="color: var(--main); margin-top:0;">إضافة لعبة جديدة</h2>
+        <h2 id="panelTitle" style="color: var(--main); margin-top:0;">إضافة لعبة جديدة</h2>
+        <input type="hidden" id="editGameId"> <!-- حقل مخفي لحفظ ID اللعبة عند التعديل -->
+        
         <div class="form-group"><input type="text" id="gameTitle" placeholder="اسم اللعبة (مثال: Minecraft)"></div>
         <div class="form-group"><input type="text" id="gameSize" placeholder="الحجم (مثال: 1.5 GB)"></div>
         <div class="form-group"><input type="text" id="gameImage" placeholder="رابط صورة اللعبة (ضع رابط الصورة هنا)"></div>
-        <div class="form-group"><input type="text" id="gameLink" placeholder="رابط التحميل (أي رابط تريد)"></div>
+        <div class="form-group"><input type="text" id="gameLink" placeholder="رابط التحميل أو الشراء (أي رابط تريد)"></div>
         <div class="form-group">
             <select id="gameType">
-                <option value="free">مجانية (Free)</option>
-                <option value="paid">مدفوعة (Paid)</option>
+                <option value="free">مجانية (Free) - يظهر زر تحميل</option>
+                <option value="paid">مدفوعة (Paid) - يظهر زر شراء</option>
             </select>
         </div>
-        <button class="btn" onclick="addGame()">إضافة للموقع فوراً 🚀</button>
+        <button class="btn" id="submitGameBtn" onclick="addGame()">إضافة للموقع فوراً 🚀</button>
+        <button class="btn" id="cancelEditBtn" style="background: #7f8c8d; display: none; margin-right: 10px;" onclick="resetForm()">إلغاء التعديل</button>
     </section>
 
-    <h2 style="text-align: center; margin-bottom: 25px;">الألعاب المتوفرة للتحميل</h2>
+    <h2 style="text-align: center; margin-bottom: 25px;">الألعاب المتوفرة للتحميل والشراء</h2>
     <div class="grid" id="gamesGrid"><p style="text-align: center;">جاري جلب الألعاب المضافة...</p></div>
 
     <!-- صندوق الدعم المادي والاقتراحات -->
@@ -92,7 +102,7 @@
             <div class="form-group"><input type="text" id="supportText" placeholder="اكتب اقتراحك أو كود الرصيد هنا..."></div>
             <button class="btn" style="width: 100%;" onclick="sendSuggestion()">إرسال فوراً</button>
         </div>
-        <button class="support-btn" onclick="toggleSupportBox()">💬 الدعم والاقتراحات</button>
+        <button class="support-btn" id="supportBtnMain" onclick="toggleSupportBox()">💬 الدعم والاقتراحات</button>
     </div>
 
     <script>
@@ -108,6 +118,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         let isAdminLoggedIn = false;
+        let allGamesData = {}; // لحفظ بيانات الألعاب محلياً لسهولة التعديل
 
         // فحص ظهور شاشة الترحيب
         function checkWelcomeScreen() {
@@ -132,13 +143,13 @@
             if (password === "4x2026") { 
                 isAdminLoggedIn = true; 
                 document.getElementById('adminPanel').style.display = "block";
-                updateDeleteButtonsVisibility();
+                updateAdminButtonsVisibility();
             }
             else if (password !== null) alert("الرمز السري خاطئ!");
         }
 
-        function updateDeleteButtonsVisibility() {
-            document.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = isAdminLoggedIn ? 'block' : 'none');
+        function updateAdminButtonsVisibility() {
+            document.querySelectorAll('.admin-actions').forEach(panel => panel.style.display = isAdminLoggedIn ? 'flex' : 'none');
         }
 
         function fetchGames() {
@@ -147,13 +158,23 @@
                 const data = snapshot.val();
                 grid.innerHTML = '';
                 if(data) {
+                    allGamesData = data; // حفظ النسخة الحالية
                     Object.keys(data).reverse().forEach(key => {
                         const game = data[key];
-                        const showDelete = isAdminLoggedIn ? 'style="display:block;"' : '';
+                        const showAdminStyle = isAdminLoggedIn ? 'style="display:flex;"' : '';
                         
-                        // تحديد الشارة ونوع اللعبة
-                        const typeBadge = game.type === 'paid' ? '<span class="badge paid">مدفوعة</span>' : '<span class="badge free">مجانية</span>';
-                        // صورة افتراضية في حال لم يضع الأدمن رابط صورة
+                        // تحديد الشارة ونوع الزر (تحميل أو شراء)
+                        let typeBadge = '';
+                        let actionBtn = '';
+                        
+                        if (game.type === 'paid') {
+                            typeBadge = '<span class="badge paid">مدفوعة</span>';
+                            actionBtn = `<button class="buy-btn" onclick="openPurchaseFlow()">شراء اللعبة 🛒</button>`;
+                        } else {
+                            typeBadge = '<span class="badge free">مجانية</span>';
+                            actionBtn = `<a href="${game.link}" class="download-btn" target="_blank">تحميل اللعبة 📥</a>`;
+                        }
+
                         const defaultImg = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500";
                         const gameImg = game.image && game.image.trim() !== "" ? game.image : defaultImg;
 
@@ -164,8 +185,11 @@
                                 <div class="card-body">
                                     <h3>${game.title}</h3>
                                     <div class="size-info">الحجم: ${game.size || 'غير محدد'}</div>
-                                    <a href="${game.link}" class="download-btn" target="_blank">تحميل اللعبة</a>
-                                    <button class="delete-btn" ${showDelete} onclick="deleteGame('${key}')">حذف اللعبة ❌</button>
+                                    ${actionBtn}
+                                    <div class="admin-actions" ${showAdminStyle}>
+                                        <button class="edit-btn" onclick="startEditGame('${key}')">تعديل ✏️</button>
+                                        <button class="delete-btn" onclick="deleteGame('${key}')">حذف ❌</button>
+                                    </div>
                                 </div>
                             </div>`;
                     });
@@ -173,6 +197,14 @@
                     grid.innerHTML = '<p style="text-align:center; color:#a1a1a1;">لا توجد ألعاب مضافة حالياً.</p>';
                 }
             });
+        }
+
+        function openPurchaseFlow() {
+            // فتح صندوق طرق الدفع فوراً عند الضغط على شراء
+            const box = document.getElementById('supportBox');
+            box.style.display = 'block';
+            document.getElementById('supportBtnMain').scrollIntoView({ behavior: 'smooth' });
+            alert("لشراء اللعبة، يرجى تحويل المبلغ عبر إحدى الطرق التالية وإرسال كود التأكيد بالصندوق الأسفل! 👇");
         }
 
         function addGame() {
@@ -183,16 +215,71 @@
             const link = document.getElementById('gameLink').value;
             const type = document.getElementById('gameType').value;
 
-            if(title && link) {
-                database.ref('games').push().set({ title, size, image, link, type });
+            if(!title || !link) return alert("يرجى كتابة اسم اللعبة ورابط التحميل على الأقل!");
+
+            database.ref('games').push().set({ title, size, image, link, type }).then(() => {
                 alert("تم رفع اللعبة للمتجر بنجاح! 🎉");
-                document.getElementById('gameTitle').value = '';
-                document.getElementById('gameSize').value = '';
-                document.getElementById('gameImage').value = '';
-                document.getElementById('gameLink').value = '';
-            } else {
-                alert("يرجى كتابة اسم اللعبة ورابط التحميل على الأقل!");
-            }
+                resetForm();
+            });
+        }
+
+        // دالة بدء تعديل اللعبة ونقل بياناتها للفروم فوك
+        function startEditGame(gameId) {
+            const game = allGamesData[gameId];
+            if (!game) return;
+
+            document.getElementById('panelTitle').innerText = "تعديل بيانات المنتج ✏️";
+            document.getElementById('editGameId').value = gameId;
+            document.getElementById('gameTitle').value = game.title || '';
+            document.getElementById('gameSize').value = game.size || '';
+            document.getElementById('gameImage').value = game.image || '';
+            document.getElementById('gameLink').value = game.link || '';
+            document.getElementById('gameType').value = game.type || 'free';
+
+            // تحويل زر الإضافة إلى زر حفظ التعديلات
+            const submitBtn = document.getElementById('submitGameBtn');
+            submitBtn.innerText = "حفظ التعديلات المحدثة 💾";
+            submitBtn.onclick = function() { saveEditedGame(); };
+            
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // دالة حفظ التعديلات وإرسالها للفايربيس
+        function saveEditedGame() {
+            const gameId = document.getElementById('editGameId').value;
+            const title = document.getElementById('gameTitle').value;
+            const size = document.getElementById('gameSize').value;
+            const image = document.getElementById('gameImage').value;
+            const link = document.getElementById('gameLink').value;
+            const type = document.getElementById('gameType').value;
+
+            if(!title || !link) return alert("الاسم والرابط مطلوبين!");
+
+            database.ref('games/' + gameId).update({ title, size, image, link, type })
+                .then(() => {
+                    alert("تم تحديث بيانات اللعبة بنجاح! ✏️🎉");
+                    resetForm();
+                })
+                .catch(err => alert("فشل التحديث: " + err.message));
+        }
+
+        // إعادة تصفير الفورم للوضع الطبيعي
+        function resetForm() {
+            document.getElementById('panelTitle').innerText = "إضافة لعبة جديدة";
+            document.getElementById('editGameId').value = '';
+            document.getElementById('gameTitle').value = '';
+            document.getElementById('gameSize').value = '';
+            document.getElementById('gameImage').value = '';
+            document.getElementById('gameLink').value = '';
+            document.getElementById('gameType').value = 'free';
+
+            const submitBtn = document.getElementById('submitGameBtn');
+            submitBtn.innerText = "إضافة للموقع فوراً 🚀";
+            submitBtn.onclick = function() { addGame(); };
+
+            document.getElementById('cancelEditBtn').style.display = 'none';
         }
 
         function deleteGame(gameId) {
