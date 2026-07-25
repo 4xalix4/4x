@@ -7,7 +7,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; --text: #e2e8f0; --danger: #e74c3c; --blue: #3498db; }
+        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; --text: #e2e8f0; --danger: #e74c3c; --blue: #3498db; --discord: #5865F2; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; min-height: 100vh; }
         
         /* شاشة الترحيب */
@@ -25,15 +25,17 @@
         
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
         
-        /* كارت اللعبة المطور */
+        /* كارت اللعبة */
         .card { background-color: var(--card); border-radius: 10px; border: 1px solid #232731; overflow: hidden; position: relative; display: flex; flex-direction: column; transition: transform 0.2s; }
         .card:hover { transform: translateY(-5px); }
         .card img { width: 100%; height: 170px; object-fit: cover; background: #111; }
         .card-body { padding: 15px; text-align: center; display: flex; flex-direction: column; flex-grow: 1; }
         .card-body h3 { margin: 10px 0 5px 0; font-size: 14pt; color: white; }
-        .card-body .size-info { color: #94a3b8; font-size: 10pt; margin-bottom: 15px; }
         
-        /* شارات نوع اللعبة */
+        /* تنسيق الحجم والسعر */
+        .info-container { margin-bottom: 15px; font-size: 10pt; color: #94a3b8; display: flex; flex-direction: column; gap: 4px; }
+        .price-tag { color: #f1c40f; font-weight: bold; font-size: 11pt; }
+
         .badge { position: absolute; top: 10px; right: 10px; padding: 4px 10px; border-radius: 4px; font-size: 9pt; font-weight: bold; color: black; }
         .badge.free { background: var(--main); }
         .badge.paid { background: #f1c40f; }
@@ -44,19 +46,21 @@
         .buy-btn { display: inline-block; width: 100%; padding: 10px 0; background: #f1c40f; border: 2px solid #f1c40f; color: black; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: auto; cursor: pointer; text-align: center; }
         .buy-btn:hover { background: transparent; color: #f1c40f; }
 
-        /* أزرار التحكم للأدمن */
         .admin-actions { display: none; margin-top: 10px; gap: 8px; }
         .edit-btn { flex: 1; padding: 8px 0; background: var(--blue); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
         .delete-btn { flex: 1; padding: 8px 0; background: var(--danger); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
         
+        /* صندوق الدعم والديسكورد المطور */
         .support-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
-        .support-btn { background: var(--main); color: black; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; }
-        .support-box { display: none; width: 290px; background: var(--card); border: 1px solid var(--main); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+        .support-btn { background: var(--main); color: black; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .support-box { display: none; width: 300px; background: var(--card); border: 1px solid var(--main); border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
+        
+        .discord-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 0; background: var(--discord); color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-bottom: 12px; transition: background 0.2s; }
+        .discord-link-btn:hover { background: #4752C4; }
     </style>
 </head>
 <body>
 
-    <!-- واجهة الترحيب الفخمة للزائر الجديد -->
     <div class="welcome-screen" id="welcomeScreen" style="display: none;">
         <h1>🎮 4X IRAQ</h1>
         <p>أهلاً بك في المتجر الذكي للألعاب والخدمات</p>
@@ -69,17 +73,18 @@
     </header>
 
     <section id="adminPanel" class="admin-section">
-        <h2 id="panelTitle" style="color: var(--main); margin-top:0;">إضافة لعبة جديدة</h2>
+        <h2 id="panelTitle" style="color: var(--main); margin-top:0;">إضافة منتج جديد</h2>
         <input type="hidden" id="editGameId">
         
-        <div class="form-group"><input type="text" id="gameTitle" placeholder="اسم المنتج (مثال: Robux 400)"></div>
-        <div class="form-group"><input type="text" id="gameSize" placeholder="الحجم أو التفاصيل (مثال: شحن فوري أو 1.5 GB)"></div>
+        <div class="form-group"><input type="text" id="gameTitle" placeholder="اسم المنتج (مثال: Robux 400 أو Minecraft)"></div>
+        <div class="form-group"><input type="text" id="gameSize" placeholder="الحجم (مثال: 1.5 GB أو غير محدد)"></div>
+        <div class="form-group"><input type="text" id="gamePrice" placeholder="السعر (مثال: 5,000 دينار أو 5$ آسيا)"></div>
         <div class="form-group"><input type="text" id="gameImage" placeholder="رابط صورة المنتج"></div>
-        <div class="form-group"><input type="text" id="gameLink" placeholder="الرابط (رابط التحميل للمجاني / رابط التواصل أو صورة الدفع للمدفوع)"></div>
+        <div class="form-group"><input type="text" id="gameLink" placeholder="الرابط (رابط التحميل للمجاني / رابط التواصل للمدفوغ)"></div>
         <div class="form-group">
             <select id="gameType">
-                <option value="free">مجانية (Free) - يظهر زر تحميل اللعبة</option>
-                <option value="paid">مدفوعة (Paid) - يظهر زر شراء اللعبة (يفتح الرابط مباشرة)</option>
+                <option value="free">مجانية (Free) - يظهر زر تحميل</option>
+                <option value="paid">مدفوعة (Paid) - يظهر زر شراء</option>
             </select>
         </div>
         <button class="btn" id="submitGameBtn" onclick="addGame()">إضافة للموقع فوراً 🚀</button>
@@ -89,20 +94,27 @@
     <h2 style="text-align: center; margin-bottom: 25px;">الألعاب والخدمات المتوفرة</h2>
     <div class="grid" id="gamesGrid"><p style="text-align: center;">جاري جلب البيانات المضافة...</p></div>
 
-    <!-- صندوق الدعم المادي والاقتراحات السفلي -->
+    <!-- صندوق الدعم والديسكورد السفلي -->
     <div class="support-widget">
         <div class="support-box" id="supportBox">
-            <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">💡 طرق الدعم المادي للمتجر</h4>
-            <p style="font-size: 10pt; color: #e2e8f0; line-height: 1.6; margin: 0 0 10px 0;">
+            <!-- زر الديسكورد المباشر -->
+            <a href="https://discord.gg/Swmu4QVUqG" target="_blank" class="discord-link-btn">
+                <span>الانضمام لسيرفر الديسكورد 💬</span>
+            </a>
+
+            <hr style="border: 0; border-top: 1px solid #334155; margin: 12px 0;">
+
+            <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">💡 طرق الدعم المادي</h4>
+            <p style="font-size: 9.5pt; color: #e2e8f0; line-height: 1.6; margin: 0 0 10px 0;">
                 💳 <b>سوبر كي:</b> 1368224570 <br>
                 💰 <b>زين كاش:</b> اكتب_رقمك_هنا <br>
                 📱 <b>آسيا سيل:</b> اكتب_رقمك_هنا <br>
                 📌 <i>أو أرسل كود كارت الشحن بالأسفل:</i>
             </p>
-            <div class="form-group"><input type="text" id="supportText" placeholder="اكتب اقتراحك أو كود الرصيد هنا..."></div>
+            <div class="form-group"><input type="text" id="supportText" placeholder="اكتب اقتراحك أو كود الرصيد..."></div>
             <button class="btn" style="width: 100%;" onclick="sendSuggestion()">إرسال فوراً</button>
         </div>
-        <button class="support-btn" id="supportBtnMain" onclick="toggleSupportBox()">💬 الدعم والاقتراحات</button>
+        <button class="support-btn" id="supportBtnMain" onclick="toggleSupportBox()">💬 الديسكورد والدعم</button>
     </div>
 
     <script>
@@ -165,7 +177,6 @@
                         let typeBadge = '';
                         let actionBtn = '';
                         
-                        // هنا التعديل: إذا كان مدفوع يفتح الرابط مباشرة بصفحة جديدة مثل المجاني تماماً
                         if (game.type === 'paid') {
                             typeBadge = '<span class="badge paid">مدفوعة</span>';
                             actionBtn = `<a href="${game.link}" class="buy-btn" target="_blank">شراء اللعبة 🛒</a>`;
@@ -177,13 +188,19 @@
                         const defaultImg = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500";
                         const gameImg = game.image && game.image.trim() !== "" ? game.image : defaultImg;
 
+                        const sizeText = game.size ? `<span>الحجم: ${game.size}</span>` : '';
+                        const priceText = game.price ? `<span class="price-tag">السعر: ${game.price}</span>` : '';
+
                         grid.innerHTML += `
                             <div class="card" id="card-${key}">
                                 ${typeBadge}
                                 <img src="${gameImg}" alt="${game.title}">
                                 <div class="card-body">
                                     <h3>${game.title}</h3>
-                                    <div class="size-info">الحجم: ${game.size || 'غير محدد'}</div>
+                                    <div class="info-container">
+                                        ${sizeText}
+                                        ${priceText}
+                                    </div>
                                     ${actionBtn}
                                     <div class="admin-actions" ${showAdminStyle}>
                                         <button class="edit-btn" onclick="startEditGame('${key}')">تعديل ✏️</button>
@@ -202,13 +219,14 @@
             if (!isAdminLoggedIn) return;
             const title = document.getElementById('gameTitle').value;
             const size = document.getElementById('gameSize').value;
+            const price = document.getElementById('gamePrice').value;
             const image = document.getElementById('gameImage').value;
             const link = document.getElementById('gameLink').value;
             const type = document.getElementById('gameType').value;
 
             if(!title || !link) return alert("يرجى كتابة الاسم والرابط على الأقل!");
 
-            database.ref('games').push().set({ title, size, image, link, type }).then(() => {
+            database.ref('games').push().set({ title, size, price, image, link, type }).then(() => {
                 alert("تم الرفع بنجاح! 🎉");
                 resetForm();
             });
@@ -222,6 +240,7 @@
             document.getElementById('editGameId').value = gameId;
             document.getElementById('gameTitle').value = game.title || '';
             document.getElementById('gameSize').value = game.size || '';
+            document.getElementById('gamePrice').value = game.price || '';
             document.getElementById('gameImage').value = game.image || '';
             document.getElementById('gameLink').value = game.link || '';
             document.getElementById('gameType').value = game.type || 'free';
@@ -239,13 +258,14 @@
             const gameId = document.getElementById('editGameId').value;
             const title = document.getElementById('gameTitle').value;
             const size = document.getElementById('gameSize').value;
+            const price = document.getElementById('gamePrice').value;
             const image = document.getElementById('gameImage').value;
             const link = document.getElementById('gameLink').value;
             const type = document.getElementById('gameType').value;
 
             if(!title || !link) return alert("الاسم والرابط مطلوبين!");
 
-            database.ref('games/' + gameId).update({ title, size, image, link, type })
+            database.ref('games/' + gameId).update({ title, size, price, image, link, type })
                 .then(() => {
                     alert("تم تحديث البيانات بنجاح! ✏️🎉");
                     resetForm();
@@ -254,10 +274,11 @@
         }
 
         function resetForm() {
-            document.getElementById('panelTitle').innerText = "إضافة لعبة جديدة";
+            document.getElementById('panelTitle').innerText = "إضافة منتج جديد";
             document.getElementById('editGameId').value = '';
             document.getElementById('gameTitle').value = '';
             document.getElementById('gameSize').value = '';
+            document.getElementById('gamePrice').value = '';
             document.getElementById('gameImage').value = '';
             document.getElementById('gameLink').value = '';
             document.getElementById('gameType').value = 'free';
