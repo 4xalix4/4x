@@ -50,13 +50,15 @@
         .edit-btn { flex: 1; padding: 8px 0; background: var(--blue); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
         .delete-btn { flex: 1; padding: 8px 0; background: var(--danger); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
         
-        /* صندوق الدعم والديسكورد المطور */
+        /* صندوق الدعم الفني المحدث */
         .support-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
         .support-btn { background: var(--main); color: black; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
         .support-box { display: none; width: 300px; background: var(--card); border: 1px solid var(--main); border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
         
         .discord-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 0; background: var(--discord); color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-bottom: 12px; transition: background 0.2s; }
         .discord-link-btn:hover { background: #4752C4; }
+
+        .notice-box { background: #0b0f19; border-right: 3px solid #f1c40f; padding: 10px; border-radius: 5px; font-size: 9.5pt; color: #e2e8f0; line-height: 1.5; margin-bottom: 12px; text-align: right; }
     </style>
 </head>
 <body>
@@ -94,27 +96,29 @@
     <h2 style="text-align: center; margin-bottom: 25px;">الألعاب والخدمات المتوفرة</h2>
     <div class="grid" id="gamesGrid"><p style="text-align: center;">جاري جلب البيانات المضافة...</p></div>
 
-    <!-- صندوق الدعم والديسكورد السفلي -->
+    <!-- صندوق الدعم الفني السفلي -->
     <div class="support-widget">
         <div class="support-box" id="supportBox">
+            <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">🛠️ الدعم الفني والتواصل</h4>
+
             <!-- زر الديسكورد المباشر -->
             <a href="https://discord.gg/Swmu4QVUqG" target="_blank" class="discord-link-btn">
                 <span>الانضمام لسيرفر الديسكورد 💬</span>
             </a>
 
-            <hr style="border: 0; border-top: 1px solid #334155; margin: 12px 0;">
+            <!-- تنبيه السياسة -->
+            <div class="notice-box">
+                ⚠️ <b>تنبيه مهم:</b> إذا تم إرسال الطلب أو الشحن وتسليمه لك بنجاح، فلا يمكن استرجاع المبلغ نهائياً.
+            </div>
 
-            <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">💡 طرق الدعم المادي</h4>
-            <p style="font-size: 9.5pt; color: #e2e8f0; line-height: 1.6; margin: 0 0 10px 0;">
-                💳 <b>سوبر كي:</b> 1368224570 <br>
-                💰 <b>زين كاش:</b> اكتب_رقمك_هنا <br>
-                📱 <b>آسيا سيل:</b> اكتب_رقمك_هنا <br>
-                📌 <i>أو أرسل كود كارت الشحن بالأسفل:</i>
+            <p style="font-size: 9pt; color: #a1a1a1; margin: 0 0 8px 0; text-align: center;">
+                إذا واجهتك أي مشكلة أو استفسار، اترك رسالتك بالأسفل:
             </p>
-            <div class="form-group"><input type="text" id="supportText" placeholder="اكتب اقتراحك أو كود الرصيد..."></div>
-            <button class="btn" style="width: 100%;" onclick="sendSuggestion()">إرسال فوراً</button>
+
+            <div class="form-group"><input type="text" id="supportText" placeholder="اكتب مشكلتك أو استفسارك هنا..."></div>
+            <button class="btn" style="width: 100%;" onclick="sendSuggestion()">إرسال فوراً 📩</button>
         </div>
-        <button class="support-btn" id="supportBtnMain" onclick="toggleSupportBox()">💬 الديسكورد والدعم</button>
+        <button class="support-btn" id="supportBtnMain" onclick="toggleSupportBox()">🛠️ الدعم الفني</button>
     </div>
 
     <script>
@@ -302,7 +306,7 @@
         function toggleSupportBox() { const box = document.getElementById('supportBox'); box.style.display = (box.style.display === 'block') ? 'none' : 'block'; }
         function sendSuggestion() {
             const text = document.getElementById('supportText').value;
-            if(text) { database.ref('suggestions').push().set({ message: text, timestamp: new Date().toISOString() }); alert("تم الإرسال بنجاح! شكراً لك."); document.getElementById('supportText').value = ''; }
+            if(text) { database.ref('suggestions').push().set({ message: text, timestamp: new Date().toISOString() }); alert("تم إرسال الرسالة بنجاح! سنقوم بالرد عليك قريباً."); document.getElementById('supportText').value = ''; }
         }
         
         window.onload = function() {
