@@ -3,122 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4X IRAQ | المتجر الذكي للألعاب</title>
+    <title>4X IRAQ | المتجر الذكي للألعاب والخدمات</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        :root { --main: #2ecc71; --bg: #0f1014; --card: #1a1c23; --text: #e2e8f0; --danger: #e74c3c; --blue: #3498db; --discord: #5865F2; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; min-height: 100vh; }
-        
-        /* شاشة الترحيب */
-        .welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #090a0f; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; transition: all 0.5s ease; }
-        .welcome-screen h1 { color: var(--main); font-size: 35pt; margin-bottom: 10px; text-shadow: 0 0 15px rgba(46, 204, 113, 0.4); }
-        .welcome-screen p { color: #a1a1a1; font-size: 14pt; margin-bottom: 25px; }
+        :root {
+            --main: #2ecc71;
+            --bg: #0f1014;
+            --card: #1a1c23;
+            --card-border: #2ecc7133;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --danger: #e74c3c;
+            --blue: #3498db;
+            --gold: #f1c40f;
+            --discord: #5865F2;
+        }
 
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 2px solid var(--main); margin-bottom: 30px; }
-        header h1 { color: var(--main); margin: 0; font-size: 20pt; }
-        .btn { background: var(--main); color: #000; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        
-        .admin-section { background: var(--card); padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #334155; display: none; }
-        .form-group { margin-bottom: 15px; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; background: #0b0f19; border: 1px solid #334155; color: white; border-radius: 5px; box-sizing: border-box; font-family: inherit; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
-        
-        /* كارت اللعبة */
-        .card { background-color: var(--card); border-radius: 10px; border: 1px solid #232731; overflow: hidden; position: relative; display: flex; flex-direction: column; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-5px); }
-        .card img { width: 100%; height: 170px; object-fit: cover; background: #111; }
-        .card-body { padding: 15px; text-align: center; display: flex; flex-direction: column; flex-grow: 1; }
-        .card-body h3 { margin: 10px 0 5px 0; font-size: 14pt; color: white; }
-        
-        /* تنسيق الحجم والسعر */
-        .info-container { margin-bottom: 15px; font-size: 10pt; color: #94a3b8; display: flex; flex-direction: column; gap: 4px; }
-        .price-tag { color: #f1c40f; font-weight: bold; font-size: 11pt; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-        .badge { position: absolute; top: 10px; right: 10px; padding: 4px 10px; border-radius: 4px; font-size: 9pt; font-weight: bold; color: black; }
+        /* الهيدر */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        header h1 { color: var(--main); margin: 0; font-size: 22pt; font-weight: 800; }
+        
+        .btn-main {
+            background: var(--main);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-main:hover { opacity: 0.9; transform: scale(1.02); }
+
+        /* شبكة الكروت */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto 80px auto;
+        }
+
+        /* الكارت الموحد */
+        .card {
+            background-color: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.15);
+        }
+        .card img { width: 100%; height: 180px; object-fit: cover; background: #111; }
+        .card-body { padding: 18px; text-align: center; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-body h3 { margin: 0 0 10px 0; font-size: 15pt; color: white; }
+        
+        .info-container { margin-bottom: 15px; font-size: 10pt; color: var(--text-dim); display: flex; flex-direction: column; gap: 5px; }
+        .price-tag { color: var(--gold); font-weight: bold; font-size: 12pt; }
+
+        .badge {
+            position: absolute; top: 12px; right: 12px;
+            padding: 4px 12px; border-radius: 6px; font-size: 8.5pt; font-weight: bold; color: black;
+        }
         .badge.free { background: var(--main); }
-        .badge.paid { background: #f1c40f; }
+        .badge.paid { background: var(--gold); }
 
-        .download-btn { display: inline-block; width: 100%; padding: 10px 0; background: transparent; border: 2px solid var(--main); color: var(--main); text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: auto; cursor: pointer; text-align: center; }
-        .download-btn:hover { background: var(--main); color: black; }
-        
-        .buy-btn { display: inline-block; width: 100%; padding: 10px 0; background: #f1c40f; border: 2px solid #f1c40f; color: black; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: auto; cursor: pointer; text-align: center; }
-        .buy-btn:hover { background: transparent; color: #f1c40f; }
+        .action-btn {
+            display: block; width: 100%; padding: 12px 0; border: none;
+            border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; box-sizing: border-box;
+            transition: 0.2s;
+        }
+        .btn-buy { background: var(--gold); color: #000; }
+        .btn-buy:hover { background: #d4ac0d; }
+        .btn-download { background: transparent; border: 2px solid var(--main); color: var(--main); }
+        .btn-download:hover { background: var(--main); color: #000; }
 
-        .admin-actions { display: none; margin-top: 10px; gap: 8px; }
-        .edit-btn { flex: 1; padding: 8px 0; background: var(--blue); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        .delete-btn { flex: 1; padding: 8px 0; background: var(--danger); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        
-        /* صندوق الدعم الفني المحدث */
+        /* نافذة الشراء المنبثقة الموحدة (Modal) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); z-index: 3000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-card {
+            background: var(--card); border: 1px solid var(--main);
+            border-radius: 15px; width: 90%; max-width: 420px; padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; text-align: right;
+        }
+        .close-btn { position: absolute; top: 15px; left: 20px; font-size: 20pt; color: #fff; cursor: pointer; }
+        .modal-card h3 { margin-top: 0; color: var(--main); text-align: center; font-size: 16pt; }
+
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 9.5pt; margin-bottom: 6px; color: var(--text-dim); }
+        .input-group input {
+            width: 100%; padding: 12px; background: #0f1014; border: 1px solid #334155;
+            color: #fff; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 10.5pt;
+        }
+        .input-group input:focus { border-color: var(--main); }
+
+        /* الدعم الفني السفلي */
         .support-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
-        .support-btn { background: var(--main); color: black; border: none; padding: 12px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-        .support-box { display: none; width: 300px; background: var(--card); border: 1px solid var(--main); border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
-        
-        .discord-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 0; background: var(--discord); color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-bottom: 12px; transition: background 0.2s; }
-        .discord-link-btn:hover { background: #4752C4; }
-
-        .notice-box { background: #0b0f19; border-right: 3px solid #f1c40f; padding: 10px; border-radius: 5px; font-size: 9.5pt; color: #e2e8f0; line-height: 1.5; margin-bottom: 12px; text-align: right; }
+        .support-btn { background: var(--main); color: black; border: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .support-box { display: none; width: 310px; background: var(--card); border: 1px solid var(--main); border-radius: 12px; padding: 18px; margin-bottom: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.7); }
+        .discord-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 0; background: var(--discord); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin-bottom: 12px; }
+        .notice-box { background: #0f1014; border-right: 3px solid var(--gold); padding: 10px; border-radius: 6px; font-size: 9pt; color: var(--text); line-height: 1.5; margin-bottom: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="welcome-screen" id="welcomeScreen" style="display: none;">
-        <h1>🎮 4X IRAQ</h1>
-        <p>أهلاً بك في المتجر الذكي للألعاب والخدمات</p>
-        <button class="btn" style="padding: 12px 30px; font-size: 12pt;" onclick="closeWelcomeScreen()">دخول المتجر 🚀</button>
-    </div>
-
     <header>
         <h1>🎮 4X IRAQ</h1>
-        <button class="btn" onclick="checkAdminPassword()">لوحة التحكم</button>
+        <button class="btn-main" onclick="checkAdminPassword()">لوحة التحكم</button>
     </header>
 
-    <section id="adminPanel" class="admin-section">
+    <!-- لوحة التحكم (مخفية) -->
+    <section id="adminPanel" style="display:none; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--card-border); margin-bottom: 30px;">
         <h2 id="panelTitle" style="color: var(--main); margin-top:0;">إضافة منتج جديد</h2>
         <input type="hidden" id="editGameId">
-        
-        <div class="form-group"><input type="text" id="gameTitle" placeholder="اسم المنتج (مثال: Robux 400 أو Minecraft)"></div>
-        <div class="form-group"><input type="text" id="gameSize" placeholder="الحجم (مثال: 1.5 GB أو غير محدد)"></div>
-        <div class="form-group"><input type="text" id="gamePrice" placeholder="السعر (مثال: 5,000 دينار أو 5$ آسيا)"></div>
-        <div class="form-group"><input type="text" id="gameImage" placeholder="رابط صورة المنتج"></div>
-        <div class="form-group"><input type="text" id="gameLink" placeholder="الرابط (رابط التحميل للمجاني / رابط التواصل للمدفوغ)"></div>
-        <div class="form-group">
-            <select id="gameType">
-                <option value="free">مجانية (Free) - يظهر زر تحميل</option>
-                <option value="paid">مدفوعة (Paid) - يظهر زر شراء</option>
+        <div class="input-group"><input type="text" id="gameTitle" placeholder="اسم المنتج"></div>
+        <div class="input-group"><input type="text" id="gameSize" placeholder="الحجم (اختياري)"></div>
+        <div class="input-group"><input type="text" id="gamePrice" placeholder="السعر"></div>
+        <div class="input-group"><input type="text" id="gameImage" placeholder="رابط الصورة"></div>
+        <div class="input-group"><input type="text" id="gameLink" placeholder="رابط التحميل أو رابط الشراء"></div>
+        <div class="input-group">
+            <select id="gameType" style="width:100%; padding:12px; background:#0f1014; border:1px solid #334155; color:#fff; border-radius:8px;">
+                <option value="free">مجانية (تحميل مباشر)</option>
+                <option value="paid">مدفوعة (فتح نافذة الشراء)</option>
             </select>
         </div>
-        <button class="btn" id="submitGameBtn" onclick="addGame()">إضافة للموقع فوراً 🚀</button>
-        <button class="btn" id="cancelEditBtn" style="background: #7f8c8d; display: none; margin-right: 10px;" onclick="resetForm()">إلغاء التعديل</button>
+        <button class="btn-main" id="submitGameBtn" onclick="addGame()">حفظ المنتج 🚀</button>
     </section>
 
-    <h2 style="text-align: center; margin-bottom: 25px;">الألعاب والخدمات المتوفرة</h2>
-    <div class="grid" id="gamesGrid"><p style="text-align: center;">جاري جلب البيانات المضافة...</p></div>
+    <h2 style="text-align: center; margin-bottom: 25px; color: white;">الألعاب والخدمات المتوفرة</h2>
+    <div class="grid" id="gamesGrid"><p style="text-align: center;">جاري جلب البيانات...</p></div>
 
-    <!-- صندوق الدعم الفني السفلي -->
-    <div class="support-widget">
-        <div class="support-box" id="supportBox">
-            <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">🛠️ الدعم الفني والتواصل</h4>
-
-            <!-- زر الديسكورد المباشر -->
-            <a href="https://discord.gg/Swmu4QVUqG" target="_blank" class="discord-link-btn">
-                <span>الانضمام لسيرفر الديسكورد 💬</span>
-            </a>
-
-            <!-- تنبيه السياسة -->
-            <div class="notice-box">
-                ⚠️ <b>تنبيه مهم:</b> إذا تم إرسال الطلب أو الشحن وتسليمه لك بنجاح، فلا يمكن استرجاع المبلغ نهائياً.
-            </div>
-
-            <p style="font-size: 9pt; color: #a1a1a1; margin: 0 0 8px 0; text-align: center;">
-                إذا واجهتك أي مشكلة أو استفسار، اترك رسالتك بالأسفل:
+    <!-- نافذة الشراء الموحدة الأوتوماتيكية -->
+    <div class="modal-overlay" id="buyModal">
+        <div class="modal-card">
+            <span class="close-btn" onclick="closeBuyModal()">&times;</span>
+            <h3 id="modalGameTitle">💳 تفاصيل الشراء</h3>
+            <p style="font-size: 9.5pt; color: var(--text-dim); text-align: center; margin-bottom: 20px;">
+                ادخل رقم الـ ID الخاص بك ليصلك الشحن فوراً بعد اكتمال العملية
             </p>
 
-            <div class="form-group"><input type="text" id="supportText" placeholder="اكتب مشكلتك أو استفسارك هنا..."></div>
-            <button class="btn" style="width: 100%;" onclick="sendSuggestion()">إرسال فوراً 📩</button>
+            <div class="input-group">
+                <label>رقم المعرف (Player ID):</label>
+                <input type="number" id="playerID" placeholder="مثال: 5123456789">
+            </div>
+
+            <button class="action-btn btn-buy" style="font-size: 11pt;" onclick="proceedToPayment()">
+                متابعة الدفع بـ SuperKey ⚡
+            </button>
+            <p id="paymentStatus" style="font-size: 9pt; color: var(--gold); text-align: center; margin-top: 10px;"></p>
         </div>
-        <button class="support-btn" id="supportBtnMain" onclick="toggleSupportBox()">🛠️ الدعم الفني</button>
+    </div>
+
+    <!-- الدعم الفني -->
+    <div class="support-widget">
+        <div class="support-box" id="supportBox">
+            <h4 style="margin:0 0 10px 0; color:var(--main); text-align:center;">🛠️ الدعم الفني</h4>
+            <a href="https://discord.gg/Swmu4QVUqG" target="_blank" class="discord-link-btn">الانضمام لسيرفر الديسكورد 💬</a>
+            <div class="notice-box">⚠️ <b>تنبيه مهم:</b> إذا تم إرسال الطلب أو الشحن وتسليمه لك بنجاح، فلا يمكن استرجاع المبلغ نهائياً.</div>
+            <div class="input-group"><input type="text" id="supportText" placeholder="اكتب مشكلتك هنا..."></div>
+            <button class="btn-main" style="width: 100%;" onclick="sendSuggestion()">إرسال 📩</button>
+        </div>
+        <button class="support-btn" onclick="toggleSupportBox()">🛠️ الدعم الفني</button>
     </div>
 
     <script>
@@ -133,39 +207,7 @@
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        let isAdminLoggedIn = false;
-        let allGamesData = {};
-
-        function checkWelcomeScreen() {
-            if (!localStorage.getItem('welcomed_4x')) {
-                document.getElementById('welcomeScreen').style.display = 'flex';
-            }
-        }
-        function closeWelcomeScreen() {
-            document.getElementById('welcomeScreen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('welcomeScreen').style.display = 'none';
-                localStorage.setItem('welcomed_4x', 'true');
-            }, 500);
-        }
-
-        function checkAdminPassword() {
-            if (isAdminLoggedIn) { 
-                document.getElementById('adminPanel').style.display = (document.getElementById('adminPanel').style.display === 'block') ? 'none' : 'block'; 
-                return; 
-            }
-            const password = prompt("أدخل رمز الأمان الخاص بك:");
-            if (password === "4x2026") { 
-                isAdminLoggedIn = true; 
-                document.getElementById('adminPanel').style.display = "block";
-                updateAdminButtonsVisibility();
-            }
-            else if (password !== null) alert("الرمز السري خاطئ!");
-        }
-
-        function updateAdminButtonsVisibility() {
-            document.querySelectorAll('.admin-actions').forEach(panel => panel.style.display = isAdminLoggedIn ? 'flex' : 'none');
-        }
+        let currentSelectedGame = null;
 
         function fetchGames() {
             database.ref('games').on('value', (snapshot) => {
@@ -173,146 +215,74 @@
                 const data = snapshot.val();
                 grid.innerHTML = '';
                 if(data) {
-                    allGamesData = data;
                     Object.keys(data).reverse().forEach(key => {
                         const game = data[key];
-                        const showAdminStyle = isAdminLoggedIn ? 'style="display:flex;"' : '';
-                        
-                        let typeBadge = '';
-                        let actionBtn = '';
-                        
-                        if (game.type === 'paid') {
-                            typeBadge = '<span class="badge paid">مدفوعة</span>';
-                            actionBtn = `<a href="${game.link}" class="buy-btn" target="_blank">شراء اللعبة 🛒</a>`;
-                        } else {
-                            typeBadge = '<span class="badge free">مجانية</span>';
-                            actionBtn = `<a href="${game.link}" class="download-btn" target="_blank">تحميل اللعبة 📥</a>`;
-                        }
-
                         const defaultImg = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500";
-                        const gameImg = game.image && game.image.trim() !== "" ? game.image : defaultImg;
+                        const gameImg = (game.image && game.image.trim() !== "") ? game.image : defaultImg;
 
-                        const sizeText = game.size ? `<span>الحجم: ${game.size}</span>` : '';
-                        const priceText = game.price ? `<span class="price-tag">السعر: ${game.price}</span>` : '';
+                        let badge = game.type === 'paid' ? '<span class="badge paid">مدفوعة</span>' : '<span class="badge free">مجانية</span>';
+                        let actionButton = game.type === 'paid' 
+                            ? `<button class="action-btn btn-buy" onclick="openBuyModal('${game.title}')">شراء الخدمة 🛒</button>`
+                            : `<a href="${game.link}" target="_blank" class="action-btn btn-download">تحميل اللعبة 📥</a>`;
 
                         grid.innerHTML += `
-                            <div class="card" id="card-${key}">
-                                ${typeBadge}
-                                <img src="${gameImg}" alt="${game.title}">
+                            <div class="card">
+                                ${badge}
+                                <img src="${gameImg}">
                                 <div class="card-body">
                                     <h3>${game.title}</h3>
                                     <div class="info-container">
-                                        ${sizeText}
-                                        ${priceText}
+                                        ${game.size ? `<span>الحجم: ${game.size}</span>` : ''}
+                                        ${game.price ? `<span class="price-tag">السعر: ${game.price}</span>` : ''}
                                     </div>
-                                    ${actionBtn}
-                                    <div class="admin-actions" ${showAdminStyle}>
-                                        <button class="edit-btn" onclick="startEditGame('${key}')">تعديل ✏️</button>
-                                        <button class="delete-btn" onclick="deleteGame('${key}')">حذف ❌</button>
-                                    </div>
+                                    ${actionButton}
                                 </div>
                             </div>`;
                     });
                 } else {
-                    grid.innerHTML = '<p style="text-align:center; color:#a1a1a1;">لا توجد منتجات مضافة حالياً.</p>';
+                    grid.innerHTML = '<p style="text-align:center;">لا توجد منتجات حالياً.</p>';
                 }
             });
         }
 
-        function addGame() {
-            if (!isAdminLoggedIn) return;
-            const title = document.getElementById('gameTitle').value;
-            const size = document.getElementById('gameSize').value;
-            const price = document.getElementById('gamePrice').value;
-            const image = document.getElementById('gameImage').value;
-            const link = document.getElementById('gameLink').value;
-            const type = document.getElementById('gameType').value;
-
-            if(!title || !link) return alert("يرجى كتابة الاسم والرابط على الأقل!");
-
-            database.ref('games').push().set({ title, size, price, image, link, type }).then(() => {
-                alert("تم الرفع بنجاح! 🎉");
-                resetForm();
-            });
+        function openBuyModal(title) {
+            currentSelectedGame = title;
+            document.getElementById('modalGameTitle').innerText = "شراء: " + title;
+            document.getElementById('buyModal').style.display = 'flex';
         }
 
-        function startEditGame(gameId) {
-            const game = allGamesData[gameId];
-            if (!game) return;
+        function closeBuyModal() {
+            document.getElementById('buyModal').style.display = 'none';
+            document.getElementById('playerID').value = '';
+            document.getElementById('paymentStatus').innerText = '';
+        }
 
-            document.getElementById('panelTitle').innerText = "تعديل بيانات المنتج ✏️";
-            document.getElementById('editGameId').value = gameId;
-            document.getElementById('gameTitle').value = game.title || '';
-            document.getElementById('gameSize').value = game.size || '';
-            document.getElementById('gamePrice').value = game.price || '';
-            document.getElementById('gameImage').value = game.image || '';
-            document.getElementById('gameLink').value = game.link || '';
-            document.getElementById('gameType').value = game.type || 'free';
-
-            const submitBtn = document.getElementById('submitGameBtn');
-            submitBtn.innerText = "حفظ التعديلات المحدثة 💾";
-            submitBtn.onclick = function() { saveEditedGame(); };
+        function proceedToPayment() {
+            const playerID = document.getElementById('playerID').value;
+            if(!playerID || playerID.length < 6) {
+                alert("يرجى كتابة رقم ID صحيح للعبة!");
+                return;
+            }
+            document.getElementById('paymentStatus').innerText = "جاري تحويلك إلى SuperKey لتأكيد الدفع... ⏳";
             
-            document.getElementById('cancelEditBtn').style.display = 'inline-block';
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+            /* الخطوة القادمة: هنا سيتم وضع كود الاتصال بـ API سوبر كي بعد حصولك على الـ Keys */
         }
 
-        function saveEditedGame() {
-            const gameId = document.getElementById('editGameId').value;
-            const title = document.getElementById('gameTitle').value;
-            const size = document.getElementById('gameSize').value;
-            const price = document.getElementById('gamePrice').value;
-            const image = document.getElementById('gameImage').value;
-            const link = document.getElementById('gameLink').value;
-            const type = document.getElementById('gameType').value;
-
-            if(!title || !link) return alert("الاسم والرابط مطلوبين!");
-
-            database.ref('games/' + gameId).update({ title, size, price, image, link, type })
-                .then(() => {
-                    alert("تم تحديث البيانات بنجاح! ✏️🎉");
-                    resetForm();
-                })
-                .catch(err => alert("فشل التحديث: " + err.message));
+        function toggleSupportBox() {
+            const box = document.getElementById('supportBox');
+            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
         }
 
-        function resetForm() {
-            document.getElementById('panelTitle').innerText = "إضافة منتج جديد";
-            document.getElementById('editGameId').value = '';
-            document.getElementById('gameTitle').value = '';
-            document.getElementById('gameSize').value = '';
-            document.getElementById('gamePrice').value = '';
-            document.getElementById('gameImage').value = '';
-            document.getElementById('gameLink').value = '';
-            document.getElementById('gameType').value = 'free';
-
-            const submitBtn = document.getElementById('submitGameBtn');
-            submitBtn.innerText = "إضافة للموقع فوراً 🚀";
-            submitBtn.onclick = function() { addGame(); };
-
-            document.getElementById('cancelEditBtn').style.display = 'none';
-        }
-
-        function deleteGame(gameId) {
-            if (!isAdminLoggedIn) return;
-            if (confirm("هل تريد حذف هذا المنتج بشكل نهائي؟")) {
-                database.ref('games/' + gameId).remove()
-                    .then(() => alert("تم الحذف بنجاح!"))
-                    .catch((error) => alert("فشل الحذف: " + error.message));
+        function sendSuggestion() {
+            const text = document.getElementById('supportText').value;
+            if(text) {
+                database.ref('suggestions').push().set({ message: text, timestamp: new Date().toISOString() });
+                alert("تم الإرسال بنجاح!");
+                document.getElementById('supportText').value = '';
             }
         }
 
-        function toggleSupportBox() { const box = document.getElementById('supportBox'); box.style.display = (box.style.display === 'block') ? 'none' : 'block'; }
-        function sendSuggestion() {
-            const text = document.getElementById('supportText').value;
-            if(text) { database.ref('suggestions').push().set({ message: text, timestamp: new Date().toISOString() }); alert("تم إرسال الرسالة بنجاح! سنقوم بالرد عليك قريباً."); document.getElementById('supportText').value = ''; }
-        }
-        
-        window.onload = function() {
-            checkWelcomeScreen();
-            fetchGames();
-        };
+        window.onload = fetchGames;
     </script>
 </body>
 </html>
