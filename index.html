@@ -14,17 +14,16 @@
             --card-border: #2ecc7133;
             --text: #e2e8f0;
             --text-dim: #94a3b8;
-            --danger: #e74c3c;
-            --blue: #3498db;
             --gold: #f1c40f;
             --discord: #5865F2;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: var(--bg);
             color: var(--text);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
             padding: 20px;
             min-height: 100vh;
         }
@@ -39,19 +38,12 @@
             border: 1px solid var(--card-border);
             border-radius: 12px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        header h1 { color: var(--main); margin: 0; font-size: 22pt; font-weight: 800; }
+        header h1 { color: var(--main); font-size: 22pt; font-weight: 800; }
         
         .btn-main {
-            background: var(--main);
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
+            background: var(--main); color: #000; border: none; padding: 10px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;
         }
         .btn-main:hover { opacity: 0.9; transform: scale(1.02); }
 
@@ -82,28 +74,20 @@
         .card img { width: 100%; height: 180px; object-fit: cover; background: #111; }
         .card-body { padding: 18px; text-align: center; display: flex; flex-direction: column; flex-grow: 1; }
         .card-body h3 { margin: 0 0 10px 0; font-size: 15pt; color: white; }
-        
-        .info-container { margin-bottom: 15px; font-size: 10pt; color: var(--text-dim); display: flex; flex-direction: column; gap: 5px; }
-        .price-tag { color: var(--gold); font-weight: bold; font-size: 12pt; }
 
         .badge {
             position: absolute; top: 12px; right: 12px;
-            padding: 4px 12px; border-radius: 6px; font-size: 8.5pt; font-weight: bold; color: black;
+            padding: 4px 12px; border-radius: 6px; font-size: 8.5pt; font-weight: bold; color: black; background: var(--gold);
         }
-        .badge.free { background: var(--main); }
-        .badge.paid { background: var(--gold); }
 
         .action-btn {
             display: block; width: 100%; padding: 12px 0; border: none;
-            border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; box-sizing: border-box;
-            transition: 0.2s;
+            border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; background: var(--gold); color: #000;
+            transition: 0.2s; margin-top: auto;
         }
-        .btn-buy { background: var(--gold); color: #000; }
-        .btn-buy:hover { background: #d4ac0d; }
-        .btn-download { background: transparent; border: 2px solid var(--main); color: var(--main); }
-        .btn-download:hover { background: var(--main); color: #000; }
+        .action-btn:hover { background: #d4ac0d; }
 
-        /* نافذة الشراء المنبثقة الموحدة (Modal) */
+        /* نافذة الشراء والباقات المنبثقة (Modal) */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); z-index: 3000;
@@ -112,11 +96,36 @@
         }
         .modal-card {
             background: var(--card); border: 1px solid var(--main);
-            border-radius: 15px; width: 90%; max-width: 420px; padding: 25px;
+            border-radius: 15px; width: 90%; max-width: 440px; padding: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; text-align: right;
         }
         .close-btn { position: absolute; top: 15px; left: 20px; font-size: 20pt; color: #fff; cursor: pointer; }
         .modal-card h3 { margin-top: 0; color: var(--main); text-align: center; font-size: 16pt; }
+
+        /* قائمة الباقات داخل النسبة المنبثقة */
+        .packages-list {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .package-item {
+            background: #0f1014;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid #334155;
+            transition: 0.2s;
+        }
+        .package-item:hover, .package-item.selected {
+            border-color: var(--main);
+            background: #16221a;
+        }
 
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; font-size: 9.5pt; margin-bottom: 6px; color: var(--text-dim); }
@@ -126,10 +135,10 @@
         }
         .input-group input:focus { border-color: var(--main); }
 
-        /* الدعم الفني السفلي */
+        /* الدعم الفني */
         .support-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
         .support-btn { background: var(--main); color: black; border: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .support-box { display: none; width: 310px; background: var(--card); border: 1px solid var(--main); border-radius: 12px; padding: 18px; margin-bottom: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.7); }
+        .support-box { display: none; width: 310px; background: var(--card); border: 1px solid var(--main); border-radius: 12px; padding: 18px; margin-bottom: 12px; }
         .discord-link-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 0; background: var(--discord); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin-bottom: 12px; }
         .notice-box { background: #0f1014; border-right: 3px solid var(--gold); padding: 10px; border-radius: 6px; font-size: 9pt; color: var(--text); line-height: 1.5; margin-bottom: 12px; }
     </style>
@@ -138,45 +147,30 @@
 
     <header>
         <h1>🎮 4X IRAQ</h1>
-        <button class="btn-main" onclick="checkAdminPassword()">لوحة التحكم</button>
+        <button class="btn-main" onclick="alert('لوحة التحكم قيد التحديث للنظام الجديد')">لوحة التحكم</button>
     </header>
 
-    <!-- لوحة التحكم (مخفية) -->
-    <section id="adminPanel" style="display:none; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--card-border); margin-bottom: 30px;">
-        <h2 id="panelTitle" style="color: var(--main); margin-top:0;">إضافة منتج جديد</h2>
-        <input type="hidden" id="editGameId">
-        <div class="input-group"><input type="text" id="gameTitle" placeholder="اسم المنتج"></div>
-        <div class="input-group"><input type="text" id="gameSize" placeholder="الحجم (اختياري)"></div>
-        <div class="input-group"><input type="text" id="gamePrice" placeholder="السعر"></div>
-        <div class="input-group"><input type="text" id="gameImage" placeholder="رابط الصورة"></div>
-        <div class="input-group"><input type="text" id="gameLink" placeholder="رابط التحميل أو رابط الشراء"></div>
-        <div class="input-group">
-            <select id="gameType" style="width:100%; padding:12px; background:#0f1014; border:1px solid #334155; color:#fff; border-radius:8px;">
-                <option value="free">مجانية (تحميل مباشر)</option>
-                <option value="paid">مدفوعة (فتح نافذة الشراء)</option>
-            </select>
-        </div>
-        <button class="btn-main" id="submitGameBtn" onclick="addGame()">حفظ المنتج 🚀</button>
-    </section>
+    <h2 style="text-align: center; margin-bottom: 25px; color: white;">اختر اللعبة أو الخدمة</h2>
+    <div class="grid" id="gamesGrid"></div>
 
-    <h2 style="text-align: center; margin-bottom: 25px; color: white;">الألعاب والخدمات المتوفرة</h2>
-    <div class="grid" id="gamesGrid"><p style="text-align: center;">جاري جلب البيانات...</p></div>
-
-    <!-- نافذة الشراء الموحدة الأوتوماتيكية -->
+    <!-- النافذة المنبثقة الاوتوماتيكية للباقات والدفع -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-card">
             <span class="close-btn" onclick="closeBuyModal()">&times;</span>
             <h3 id="modalGameTitle">💳 تفاصيل الشراء</h3>
-            <p style="font-size: 9.5pt; color: var(--text-dim); text-align: center; margin-bottom: 20px;">
-                ادخل رقم الـ ID الخاص بك ليصلك الشحن فوراً بعد اكتمال العملية
+            
+            <p style="font-size: 9.5pt; color: var(--text-dim); text-align: center; margin: 10px 0 15px 0;">
+                اختر الباقة المناسبة ثم ادخل بيانات الحساب
             </p>
 
+            <div class="packages-list" id="packagesList"></div>
+
             <div class="input-group">
-                <label>رقم المعرف (Player ID):</label>
-                <input type="number" id="playerID" placeholder="مثال: 5123456789">
+                <label id="inputLabel">رقم المعرف (Player ID):</label>
+                <input type="text" id="playerID" placeholder="أدخل بيانات المعرف هنا...">
             </div>
 
-            <button class="action-btn btn-buy" style="font-size: 11pt;" onclick="proceedToPayment()">
+            <button class="action-btn" style="font-size: 11pt;" onclick="proceedToPayment()">
                 متابعة الدفع بـ SuperKey ⚡
             </button>
             <p id="paymentStatus" style="font-size: 9pt; color: var(--gold); text-align: center; margin-top: 10px;"></p>
@@ -196,59 +190,103 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDlR7HCZj3nDngFkDEdeoIXHGsAK6hCPFY",
-            authDomain: "x-iraq.firebaseapp.com",
-            databaseURL: "https://x-iraq-default-rtdb.firebaseio.com",
-            projectId: "x-iraq",
-            storageBucket: "x-iraq.firebaseimagesstorage.app",
-            messagingSenderId: "711532790010",
-            appId: "1:711532790010:web:0989b70be91259efaac943"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        let currentSelectedGame = null;
+        // 1. قاعدة بيانات الألعاب والباقات (تقدر تضيف أو تعدل أي لعبة من هنا بكل سهولة)
+        const gamesData = [
+            {
+                id: "pubg",
+                title: "PUBG Mobile",
+                image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500",
+                idLabel: "رقم الـ Player ID:",
+                idPlaceholder: "مثال: 5123456789",
+                packages: [
+                    { name: "60 UC", price: "1,500 د.ع" },
+                    { name: "325 UC", price: "7,500 د.ع" },
+                    { name: "660 UC", price: "15,000 د.ع" }
+                ]
+            },
+            {
+                id: "roblox",
+                title: "Roblox",
+                image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=500",
+                idLabel: "اسم المستخدم (Username):",
+                idPlaceholder: "أدخل اسم حسابك في روبلوكس",
+                packages: [
+                    { name: "400 Robux", price: "10 آسيا" },
+                    { name: "800 Robux", price: "20 آسيا" }
+                ]
+            },
+            {
+                id: "discord",
+                title: "Discord Nitro",
+                image: "https://images.unsplash.com/photo-1614680376593-902f749f7041?q=80&w=500",
+                idLabel: "يوزر الديسكورد (Discord Tag):",
+                idPlaceholder: "مثال: ali_4x",
+                packages: [
+                    { name: "Nitro Basic (شهر)", price: "5,000 د.ع" },
+                    { name: "Nitro Boost (شهر)", price: "12,000 د.ع" }
+                ]
+            },
+            {
+                id: "minecraft",
+                title: "Minecraft Coins",
+                image: "https://images.unsplash.com/photo-1627856013091-fed6e4e30025?q=80&w=500",
+                idLabel: "اسم حساب ماين كرافت (Xbox Gamertag):",
+                idPlaceholder: "أدخل Gamertag الخاص بك",
+                packages: [
+                    { name: "1020 Coins", price: "10$" },
+                    { name: "1720 Coins", price: "15$" }
+                ]
+            }
+        ];
 
-        function fetchGames() {
-            database.ref('games').on('value', (snapshot) => {
-                const grid = document.getElementById('gamesGrid');
-                const data = snapshot.val();
-                grid.innerHTML = '';
-                if(data) {
-                    Object.keys(data).reverse().forEach(key => {
-                        const game = data[key];
-                        const defaultImg = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500";
-                        const gameImg = (game.image && game.image.trim() !== "") ? game.image : defaultImg;
+        let selectedGame = null;
+        let selectedPackage = null;
 
-                        let badge = game.type === 'paid' ? '<span class="badge paid">مدفوعة</span>' : '<span class="badge free">مجانية</span>';
-                        let actionButton = game.type === 'paid' 
-                            ? `<button class="action-btn btn-buy" onclick="openBuyModal('${game.title}')">شراء الخدمة 🛒</button>`
-                            : `<a href="${game.link}" target="_blank" class="action-btn btn-download">تحميل اللعبة 📥</a>`;
+        // 2. دالة بناء كروت الألعاب أوتوماتيكياً
+        function renderGames() {
+            const grid = document.getElementById('gamesGrid');
+            grid.innerHTML = '';
 
-                        grid.innerHTML += `
-                            <div class="card">
-                                ${badge}
-                                <img src="${gameImg}">
-                                <div class="card-body">
-                                    <h3>${game.title}</h3>
-                                    <div class="info-container">
-                                        ${game.size ? `<span>الحجم: ${game.size}</span>` : ''}
-                                        ${game.price ? `<span class="price-tag">السعر: ${game.price}</span>` : ''}
-                                    </div>
-                                    ${actionButton}
-                                </div>
-                            </div>`;
-                    });
-                } else {
-                    grid.innerHTML = '<p style="text-align:center;">لا توجد منتجات حالياً.</p>';
-                }
+            gamesData.forEach(game => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <span class="badge">مدفوعة</span>
+                        <img src="${game.image}" alt="${game.title}">
+                        <div class="card-body">
+                            <h3>${game.title}</h3>
+                            <button class="action-btn" onclick="openBuyModal('${game.id}')">شراء الخدمة 🛒</button>
+                        </div>
+                    </div>`;
             });
         }
 
-        function openBuyModal(title) {
-            currentSelectedGame = title;
-            document.getElementById('modalGameTitle').innerText = "شراء: " + title;
+        // 3. فتح النافذة وعرض باقات اللعبة المحددة
+        function openBuyModal(gameId) {
+            selectedGame = gamesData.find(g => g.id === gameId);
+            selectedPackage = null;
+
+            document.getElementById('modalGameTitle').innerText = "شراء: " + selectedGame.title;
+            document.getElementById('inputLabel').innerText = selectedGame.idLabel;
+            document.getElementById('playerID').placeholder = selectedGame.idPlaceholder;
+            
+            const pkgList = document.getElementById('packagesList');
+            pkgList.innerHTML = '';
+
+            selectedGame.packages.forEach((pkg, index) => {
+                pkgList.innerHTML += `
+                    <div class="package-item" onclick="selectPackage(this, '${pkg.name}', '${pkg.price}')">
+                        <span><strong>${pkg.name}</strong></span>
+                        <span style="color: var(--gold); font-weight: bold;">${pkg.price}</span>
+                    </div>`;
+            });
+
             document.getElementById('buyModal').style.display = 'flex';
+        }
+
+        function selectPackage(element, name, price) {
+            document.querySelectorAll('.package-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedPackage = { name, price };
         }
 
         function closeBuyModal() {
@@ -258,14 +296,18 @@
         }
 
         function proceedToPayment() {
-            const playerID = document.getElementById('playerID').value;
-            if(!playerID || playerID.length < 6) {
-                alert("يرجى كتابة رقم ID صحيح للعبة!");
+            const idVal = document.getElementById('playerID').value.trim();
+
+            if (!selectedPackage) {
+                alert("يرجى اختيار الباقة المطلوبة أولاً!");
                 return;
             }
-            document.getElementById('paymentStatus').innerText = "جاري تحويلك إلى SuperKey لتأكيد الدفع... ⏳";
-            
-            /* الخطوة القادمة: هنا سيتم وضع كود الاتصال بـ API سوبر كي بعد حصولك على الـ Keys */
+            if (!idVal) {
+                alert("يرجى إدخال الحقل المطلوب!");
+                return;
+            }
+
+            document.getElementById('paymentStatus').innerText = `تم اختيار ${selectedPackage.name}.. جاري التحويل لبوابة SuperKey ⚡`;
         }
 
         function toggleSupportBox() {
@@ -273,16 +315,7 @@
             box.style.display = (box.style.display === 'block') ? 'none' : 'block';
         }
 
-        function sendSuggestion() {
-            const text = document.getElementById('supportText').value;
-            if(text) {
-                database.ref('suggestions').push().set({ message: text, timestamp: new Date().toISOString() });
-                alert("تم الإرسال بنجاح!");
-                document.getElementById('supportText').value = '';
-            }
-        }
-
-        window.onload = fetchGames;
+        window.onload = renderGames;
     </script>
 </body>
 </html>
