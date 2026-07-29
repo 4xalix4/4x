@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4X IRAQ | المتجر الذكي للألعاب والخدمات</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         :root {
             --main: #2ecc71;
@@ -18,7 +16,7 @@
             --discord: #5865F2;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; text-align: right; }
 
         body {
             background-color: var(--bg);
@@ -28,7 +26,6 @@
             min-height: 100vh;
         }
 
-        /* الهيدر */
         header {
             display: flex;
             justify-content: space-between;
@@ -39,7 +36,7 @@
             border-radius: 12px;
             margin-bottom: 30px;
         }
-        header h1 { color: var(--main); font-size: 22pt; font-weight: 800; }
+        header h1 { color: var(--main); font-size: 20pt; font-weight: 800; }
         
         .btn-main {
             background: var(--main); color: #000; border: none; padding: 10px 20px;
@@ -47,7 +44,6 @@
         }
         .btn-main:hover { opacity: 0.9; transform: scale(1.02); }
 
-        /* شبكة الكروت */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -56,7 +52,6 @@
             margin: 0 auto 80px auto;
         }
 
-        /* الكارت الموحد */
         .card {
             background-color: var(--card);
             border-radius: 12px;
@@ -72,11 +67,11 @@
             box-shadow: 0 8px 20px rgba(46, 204, 113, 0.15);
         }
         .card img { width: 100%; height: 180px; object-fit: cover; background: #111; }
-        .card-body { padding: 18px; text-align: center; display: flex; flex-direction: column; flex-grow: 1; }
-        .card-body h3 { margin: 0 0 10px 0; font-size: 15pt; color: white; }
+        .card-body { padding: 18px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-body h3 { margin: 0 0 15px 0; font-size: 14pt; color: white; }
 
         .badge {
-            position: absolute; top: 12px; right: 12px;
+            position: absolute; top: 12px; left: 12px;
             padding: 4px 12px; border-radius: 6px; font-size: 8.5pt; font-weight: bold; color: black; background: var(--gold);
         }
 
@@ -87,7 +82,7 @@
         }
         .action-btn:hover { background: #d4ac0d; }
 
-        /* نافذة الشراء والباقات المنبثقة (Modal) */
+        /* النافذة المنبثقة */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); z-index: 3000;
@@ -97,23 +92,23 @@
         .modal-card {
             background: var(--card); border: 1px solid var(--main);
             border-radius: 15px; width: 90%; max-width: 440px; padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; text-align: right;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative;
         }
-        .close-btn { position: absolute; top: 15px; left: 20px; font-size: 20pt; color: #fff; cursor: pointer; }
-        .modal-card h3 { margin-top: 0; color: var(--main); text-align: center; font-size: 16pt; }
+        .close-btn { position: absolute; top: 15px; left: 20px; font-size: 18pt; color: #fff; cursor: pointer; }
+        .modal-card h3 { margin-top: 0; color: var(--main); text-align: center; font-size: 15pt; margin-bottom: 15px; }
 
-        /* قائمة الباقات داخل النسبة المنبثقة */
+        /* تعديل اتجاه الباقات (الاسم يمين والسعر يسار بشكل مرتب) */
         .packages-list {
             margin: 15px 0;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: 200px;
+            max-height: 220px;
             overflow-y: auto;
         }
         .package-item {
             background: #0f1014;
-            padding: 12px;
+            padding: 12px 15px;
             border-radius: 8px;
             display: flex;
             justify-content: space-between;
@@ -122,6 +117,9 @@
             border: 1px solid #334155;
             transition: 0.2s;
         }
+        .package-item span { text-align: right; }
+        .package-item .pkg-price { text-align: left; color: var(--gold); font-weight: bold; }
+        
         .package-item:hover, .package-item.selected {
             border-color: var(--main);
             background: #16221a;
@@ -131,11 +129,10 @@
         .input-group label { display: block; font-size: 9.5pt; margin-bottom: 6px; color: var(--text-dim); }
         .input-group input {
             width: 100%; padding: 12px; background: #0f1014; border: 1px solid #334155;
-            color: #fff; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 10.5pt;
+            color: #fff; border-radius: 8px; outline: none; font-size: 10pt; text-align: right;
         }
         .input-group input:focus { border-color: var(--main); }
 
-        /* الدعم الفني */
         .support-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
         .support-btn { background: var(--main); color: black; border: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .support-box { display: none; width: 310px; background: var(--card); border: 1px solid var(--main); border-radius: 12px; padding: 18px; margin-bottom: 12px; }
@@ -147,33 +144,38 @@
 
     <header>
         <h1>🎮 4X IRAQ</h1>
-        <button class="btn-main" onclick="alert('لوحة التحكم قيد التحديث للنظام الجديد')">لوحة التحكم</button>
+        <button class="btn-main" onclick="openControlPanel()">لوحة التحكم</button>
     </header>
 
     <h2 style="text-align: center; margin-bottom: 25px; color: white;">اختر اللعبة أو الخدمة</h2>
     <div class="grid" id="gamesGrid"></div>
 
-    <!-- النافذة المنبثقة الاوتوماتيكية للباقات والدفع -->
+    <!-- نافذة الشراء -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-card">
             <span class="close-btn" onclick="closeBuyModal()">&times;</span>
             <h3 id="modalGameTitle">💳 تفاصيل الشراء</h3>
-            
-            <p style="font-size: 9.5pt; color: var(--text-dim); text-align: center; margin: 10px 0 15px 0;">
-                اختر الباقة المناسبة ثم ادخل بيانات الحساب
-            </p>
+            <p style="font-size: 9pt; color: var(--text-dim); text-align: center; margin-bottom: 10px;">اختر الباقة المناسبة ثم ادخل بيانات الحساب</p>
 
             <div class="packages-list" id="packagesList"></div>
 
             <div class="input-group">
-                <label id="inputLabel">رقم المعرف (Player ID):</label>
-                <input type="text" id="playerID" placeholder="أدخل بيانات المعرف هنا...">
+                <label id="inputLabel">رقم المعرف:</label>
+                <input type="text" id="playerID" placeholder="أدخل البيانات هنا...">
             </div>
 
-            <button class="action-btn" style="font-size: 11pt;" onclick="proceedToPayment()">
-                متابعة الدفع بـ SuperKey ⚡
-            </button>
+            <button class="action-btn" onclick="proceedToPayment()">متابعة الدفع بـ SuperKey ⚡</button>
             <p id="paymentStatus" style="font-size: 9pt; color: var(--gold); text-align: center; margin-top: 10px;"></p>
+        </div>
+    </div>
+
+    <!-- نافذة لوحة التحكم البديلة للـ Alert -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-card">
+            <span class="close-btn" onclick="closeControlPanel()">&times;</span>
+            <h3>⚙️ لوحة التحكم</h3>
+            <p style="font-size: 9.5pt; color: var(--text-dim); margin-bottom: 15px; text-align: center;">النظام قيد التحديث لاستقبال طلبات السيرفرات والربط التلقائي.</p>
+            <button class="action-btn" onclick="closeControlPanel()">حسناً</button>
         </div>
     </div>
 
@@ -190,7 +192,6 @@
     </div>
 
     <script>
-        // 1. قاعدة بيانات الألعاب والباقات (تقدر تضيف أو تعدل أي لعبة من هنا بكل سهولة)
         const gamesData = [
             {
                 id: "pubg",
@@ -230,7 +231,7 @@
                 id: "minecraft",
                 title: "Minecraft Coins",
                 image: "https://images.unsplash.com/photo-1627856013091-fed6e4e30025?q=80&w=500",
-                idLabel: "اسم حساب ماين كرافت (Xbox Gamertag):",
+                idLabel: "اسم حساب ماين كرافت:",
                 idPlaceholder: "أدخل Gamertag الخاص بك",
                 packages: [
                     { name: "1020 Coins", price: "10$" },
@@ -242,11 +243,9 @@
         let selectedGame = null;
         let selectedPackage = null;
 
-        // 2. دالة بناء كروت الألعاب أوتوماتيكياً
         function renderGames() {
             const grid = document.getElementById('gamesGrid');
             grid.innerHTML = '';
-
             gamesData.forEach(game => {
                 grid.innerHTML += `
                     <div class="card">
@@ -260,26 +259,22 @@
             });
         }
 
-        // 3. فتح النافذة وعرض باقات اللعبة المحددة
         function openBuyModal(gameId) {
             selectedGame = gamesData.find(g => g.id === gameId);
             selectedPackage = null;
-
             document.getElementById('modalGameTitle').innerText = "شراء: " + selectedGame.title;
             document.getElementById('inputLabel').innerText = selectedGame.idLabel;
             document.getElementById('playerID').placeholder = selectedGame.idPlaceholder;
             
             const pkgList = document.getElementById('packagesList');
             pkgList.innerHTML = '';
-
-            selectedGame.packages.forEach((pkg, index) => {
+            selectedGame.packages.forEach((pkg) => {
                 pkgList.innerHTML += `
                     <div class="package-item" onclick="selectPackage(this, '${pkg.name}', '${pkg.price}')">
                         <span><strong>${pkg.name}</strong></span>
-                        <span style="color: var(--gold); font-weight: bold;">${pkg.price}</span>
+                        <span class="pkg-price">${pkg.price}</span>
                     </div>`;
             });
-
             document.getElementById('buyModal').style.display = 'flex';
         }
 
@@ -295,24 +290,27 @@
             document.getElementById('paymentStatus').innerText = '';
         }
 
+        function openControlPanel() {
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+        function closeControlPanel() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
         function proceedToPayment() {
             const idVal = document.getElementById('playerID').value.trim();
-
-            if (!selectedPackage) {
-                alert("يرجى اختيار الباقة المطلوبة أولاً!");
-                return;
-            }
-            if (!idVal) {
-                alert("يرجى إدخال الحقل المطلوب!");
-                return;
-            }
-
+            if (!selectedPackage) { alert("يرجى اختيار الباقة المطلوبة أولاً!"); return; }
+            if (!idVal) { alert("يرجى إدخال الحقل المطلوب!"); return; }
             document.getElementById('paymentStatus').innerText = `تم اختيار ${selectedPackage.name}.. جاري التحويل لبوابة SuperKey ⚡`;
         }
 
         function toggleSupportBox() {
             const box = document.getElementById('supportBox');
             box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function sendSuggestion() {
+            alert('تم استلام رسالتك، شكراً لتواصلك مع الدعم الفني!');
         }
 
         window.onload = renderGames;
