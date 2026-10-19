@@ -128,7 +128,7 @@
         <div class="products-grid" id="productsGrid"></div>
     </div>
 
-    <!-- نافذة الشراء -->
+    <!-- نافذة الشراء والتواصل -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-box">
             <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -151,14 +151,14 @@
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">🔗 تعديل روابط التواصل (الواتساب والتليجرام):</h4>
             <div class="form-group">
-                <label>رقم الواتساب الخاص بك:</label>
-                <input type="text" id="adminWaNumber" placeholder="اكتب رقمك هنا (مثال: 9647767814099)">
+                <label>رقم أو يوزر الواتساب:</label>
+                <input type="text" id="adminWaNumber" placeholder="أدخل رقمك أو يوزرك (مثال: 4xalix4)">
             </div>
             <div class="form-group">
-                <label>معرف التليجرام الخاص بك:</label>
-                <input type="text" id="adminTgUsername" placeholder="اكتب اليوزر هنا (مثال: x4x_Shopx)">
+                <label>معرف التليجرام:</label>
+                <input type="text" id="adminTgUsername" placeholder="أدخل يوزر التليجرام (مثال: x4xalix4x)">
             </div>
-            <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ الروابط الجديد 💾</button>
+            <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ الروابط 💾</button>
 
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px;">➕ إضافة منتج جديد:</h4>
@@ -183,9 +183,10 @@
     <script>
         const ADMIN_PASSWORD = "1234";
 
+        // تعيين اليوزرات الخاصة بك كافتراضية
         let socialLinks = JSON.parse(localStorage.getItem('4x_social_links')) || {
-            whatsapp: "",
-            telegram: ""
+            whatsapp: "4xalix4",
+            telegram: "x4xalix4x"
         };
 
         let storeData = JSON.parse(localStorage.getItem('4x_store_data')) || [
@@ -258,8 +259,8 @@
 
             const msg = `مرحباً، أريـد طلب هذا المنتج:\n🎮 المنتج: ${selectedItem.title}\n📦 الباقة: ${name}\n💰 السعر: ${price}`;
             
-            const cleanWa = (socialLinks.whatsapp || "9647767814099").replace('+', '').trim();
-            const cleanTg = (socialLinks.telegram || "x4x_Shopx").replace('@', '').trim();
+            const cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
+            const cleanTg = (socialLinks.telegram || "x4xalix4x").replace('@', '').trim();
 
             document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`;
             document.getElementById('tgOrderBtn').href = `https://t.me/${cleanTg}?text=${encodeURIComponent(msg)}`;
@@ -270,8 +271,9 @@
         function checkAdminPassword() {
             const pwd = prompt("أدخل كلمة المرور للوصول إلى لوحة التعديل:");
             if (pwd === ADMIN_PASSWORD) {
-                document.getElementById('adminWaNumber').value = socialLinks.whatsapp || '';
-                document.getElementById('adminTgUsername').value = socialLinks.telegram || '';
+                // ترك الخانات فارغة حتى تكتب بيدك عند الحاجة
+                document.getElementById('adminWaNumber').value = '';
+                document.getElementById('adminTgUsername').value = '';
 
                 renderAdminList();
                 document.getElementById('adminModal').style.display = 'flex';
@@ -287,7 +289,7 @@
             const tg = document.getElementById('adminTgUsername').value.trim();
 
             if (!wa || !tg) {
-                alert("يرجى إدخال رقم الواتساب ومعرف التليجرام!");
+                alert("يرجى إدخال البيانات المطلوبة للواتساب والتليجرام!");
                 return;
             }
 
