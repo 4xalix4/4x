@@ -113,11 +113,10 @@
             <button class="search-btn">🔍</button>
         </div>
         <div class="header-actions">
-            <button class="admin-btn" onclick="checkAdminPassword()">⚙️ تعديل المنتجات والروابط</button>
+            <button class="admin-btn" onclick="checkAdminPassword()">⚙️ لوحة التعديل</button>
         </div>
     </header>
 
-    <!-- شريط التصنيفات للفلترة -->
     <div class="sub-header">
         <span onclick="filterCategory('all')">🔥 الكل</span>
         <span onclick="filterCategory('games')">🎮 شحن الألعاب</span>
@@ -129,7 +128,7 @@
         <div class="products-grid" id="productsGrid"></div>
     </div>
 
-    <!-- نافذة الشراء والتواصل -->
+    <!-- نافذة الشراء -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-box">
             <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -149,20 +148,18 @@
             <span class="close-modal" onclick="closeAdminModal()">&times;</span>
             <h3>⚙️ لوحة التحكم وإدارة المتجر</h3>
             
-            <!-- قسم تعديل روابط التواصل -->
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">🔗 تعديل روابط التواصل (الواتساب والتليجرام):</h4>
             <div class="form-group">
-                <label>رقم الواتساب (بدون + أو أصفار زادت، مثلاً 9647767814099):</label>
-                <input type="text" id="adminWaNumber" placeholder="9647767814099">
+                <label>رقم الواتساب الخاص بك:</label>
+                <input type="text" id="adminWaNumber" placeholder="اكتب رقمك هنا (مثال: 9647767814099)">
             </div>
             <div class="form-group">
-                <label>معرف التليجرام (مثلاً x4x_Shopx):</label>
-                <input type="text" id="adminTgUsername" placeholder="x4x_Shopx">
+                <label>معرف التليجرام الخاص بك:</label>
+                <input type="text" id="adminTgUsername" placeholder="اكتب اليوزر هنا (مثال: x4x_Shopx)">
             </div>
-            <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ الروابط الجديدة 💾</button>
+            <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ الروابط الجديد 💾</button>
 
-            <!-- قسم إضافة المنتجات -->
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px;">➕ إضافة منتج جديد:</h4>
             
@@ -184,12 +181,11 @@
     </div>
 
     <script>
-        const ADMIN_PASSWORD = "1234"; // باسورد لوحة التحكم
+        const ADMIN_PASSWORD = "1234";
 
-        // إعدادات وروابط التواصل المحفوظة
         let socialLinks = JSON.parse(localStorage.getItem('4x_social_links')) || {
-            whatsapp: "9647767814099",
-            telegram: "x4x_Shopx"
+            whatsapp: "",
+            telegram: ""
         };
 
         let storeData = JSON.parse(localStorage.getItem('4x_store_data')) || [
@@ -197,13 +193,7 @@
                 id: "pubg", category: "games",
                 title: "شدات ببجي موبايل (PUBG Mobile UC)",
                 image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500",
-                packages: [{ name: "60 UC", price: "1,500 د.ع" }, { name: "325 UC", price: "7,500 د.ع" }]
-            },
-            {
-                id: "gpu_rx580", category: "hardware",
-                title: "كرت شاشة AMD Radeon RX 580 8GB",
-                image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=500",
-                packages: [{ name: "نسخة ممتازة نظيفة", price: "85,000 د.ع" }]
+                packages: [{ name: "60 UC", price: "1,500 د.ع" }]
             }
         ];
 
@@ -268,9 +258,8 @@
 
             const msg = `مرحباً، أريـد طلب هذا المنتج:\n🎮 المنتج: ${selectedItem.title}\n📦 الباقة: ${name}\n💰 السعر: ${price}`;
             
-            // استخدام الروابط المحفوظة من قبل الأدمن
-            const cleanWa = socialLinks.whatsapp.replace('+', '').trim();
-            const cleanTg = socialLinks.telegram.replace('@', '').trim();
+            const cleanWa = (socialLinks.whatsapp || "9647767814099").replace('+', '').trim();
+            const cleanTg = (socialLinks.telegram || "x4x_Shopx").replace('@', '').trim();
 
             document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`;
             document.getElementById('tgOrderBtn').href = `https://t.me/${cleanTg}?text=${encodeURIComponent(msg)}`;
@@ -281,9 +270,8 @@
         function checkAdminPassword() {
             const pwd = prompt("أدخل كلمة المرور للوصول إلى لوحة التعديل:");
             if (pwd === ADMIN_PASSWORD) {
-                // تعبئة حقول الروابط الحالية
-                document.getElementById('adminWaNumber').value = socialLinks.whatsapp;
-                document.getElementById('adminTgUsername').value = socialLinks.telegram;
+                document.getElementById('adminWaNumber').value = socialLinks.whatsapp || '';
+                document.getElementById('adminTgUsername').value = socialLinks.telegram || '';
 
                 renderAdminList();
                 document.getElementById('adminModal').style.display = 'flex';
@@ -294,7 +282,6 @@
 
         function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
 
-        // حفظ روابط الواتساب والتليجرام الجديدة
         function saveSocialLinks() {
             const wa = document.getElementById('adminWaNumber').value.trim();
             const tg = document.getElementById('adminTgUsername').value.trim();
@@ -306,7 +293,7 @@
 
             socialLinks = { whatsapp: wa, telegram: tg };
             localStorage.setItem('4x_social_links', JSON.stringify(socialLinks));
-            alert("تم حفظ روابط التواصل الجديدة بنجاح! 💾");
+            alert("تم حفظ الروابط بنجاح! 💾");
         }
 
         function renderAdminList() {
@@ -329,7 +316,7 @@
             const pkgPrice = document.getElementById('newPkgPrice').value.trim();
 
             if(!title || !pkgName || !pkgPrice) {
-                alert('يرجى ملء حقول اسم المنتج والباقة والسعر على الأقل!');
+                alert('يرجى ملء كافة الحقول المخصصة للمنتج!');
                 return;
             }
 
