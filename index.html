@@ -15,7 +15,6 @@
             --text-light: #565959;
             --white: #ffffff;
             --whatsapp: #25d366;
-            --telegram: #0088cc;
             --border-color: #d5d9d9;
             --danger: #cc0000;
         }
@@ -66,6 +65,7 @@
         .buy-action-btn { background: var(--az-yellow); border: none; padding: 9px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; margin-top: auto; }
         .buy-action-btn:hover { background: var(--az-yellow-hover); }
 
+        /* النوافذ المنبثقة Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.7); z-index: 3000;
@@ -88,13 +88,12 @@
 
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-size: 9pt; color: var(--text-light); margin-bottom: 4px; }
-        .form-group input, .form-group select {
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%; padding: 9px; border: 1px solid var(--border-color); border-radius: 4px; outline: none; font-size: 9.5pt;
         }
 
         .modal-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-        .btn-direct-wa { background: var(--whatsapp); color: white; border: none; padding: 10px; border-radius: 20px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 10pt; }
-        .btn-direct-tg { background: var(--telegram); color: white; border: none; padding: 10px; border-radius: 20px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 10pt; }
+        .btn-direct-wa { background: var(--whatsapp); color: white; border: none; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 11pt; }
         
         .admin-product-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -136,7 +135,6 @@
             
             <div class="modal-buttons">
                 <a id="waOrderBtn" href="#" target="_blank" class="btn-direct-wa">إتمام الطلب عبر واتساب 💬</a>
-                <a id="tgOrderBtn" href="#" target="_blank" class="btn-direct-tg">إتمام الطلب عبر تليجرام ✈️</a>
             </div>
         </div>
     </div>
@@ -147,18 +145,20 @@
             <span class="close-modal" onclick="closeAdminModal()">&times;</span>
             <h3>⚙️ لوحة التحكم وإدارة المتجر</h3>
             
+            <!-- قسم تعديل رقم الواتساب والرسالة التلقائية -->
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
-            <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">🔗 تعديل روابط التواصل (الواتساب والتليجرام):</h4>
+            <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">💬 إعدادات الواتساب والرسالة التلقائية:</h4>
             <div class="form-group">
-                <label>رقم الواتساب (أو اليوزر):</label>
-                <input type="text" id="adminWaNumber" placeholder="حط رقم الواتساب هنا">
+                <label>رقم أو يوزر الواتساب:</label>
+                <input type="text" id="adminWaNumber" placeholder="حط رقم الواتساب أو اليوزر هنا">
             </div>
             <div class="form-group">
-                <label>معرف التليجرام الشخصي (وليس القناة):</label>
-                <input type="text" id="adminTgUsername" placeholder="حط يوزر حسابك الشخصي هنا (مثال: x4xalix4x)">
+                <label>مقدمة الرسالة التلقائية (اختياري):</label>
+                <input type="text" id="adminCustomMsg" placeholder="مثال: السلام عليكم، أريد طلب هذا المنتج من متجر 4X IRAQ">
             </div>
-            <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ الروابط 💾</button>
+            <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ إعدادات الواتساب 💾</button>
 
+            <!-- قسم إضافة المنتجات -->
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px;">➕ إضافة منتج جديد:</h4>
             
@@ -195,10 +195,9 @@
     <script>
         const ADMIN_PASSWORD = "1234";
 
-        // تعيين حسابك الشخصي للتليجرام تلقائياً لتفادي فتح القناة
         let socialLinks = JSON.parse(localStorage.getItem('4x_social_links')) || {
-            whatsapp: "07767814099",
-            telegram: "x4xalix4x"
+            whatsapp: "4xalix4",
+            customMsg: "مرحباً متجر 4X IRAQ، أريد شراء المنتج التالي:"
         };
 
         let storeData = JSON.parse(localStorage.getItem('4x_store_data')) || [
@@ -277,14 +276,12 @@
             el.classList.add('selected');
             selectedPkg = { name, price };
 
-            const msg = `مرحباً، أريـد طلب هذا المنتج:\n🎮 المنتج: ${selectedItem.title}\n📦 الباقة: ${name}\n💰 السعر: ${price}`;
+            // صياغة الرسالة التلقائية المخصصة
+            const headerText = socialLinks.customMsg || "مرحباً، أريد طلب هذا المنتج:";
+            const fullMsg = `${headerText}\n\n🎮 المنتج: ${selectedItem.title}\n📦 الباقة: ${name}\n💰 السعر: ${price}`;
             
-            const cleanWa = (socialLinks.whatsapp || "07767814099").replace('+', '').trim();
-            const cleanTg = (socialLinks.telegram || "x4xalix4x").replace('@', '').trim();
-
-            document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`;
-            // استخدام رابط التليجرام الخاص بالحسابات الشخصية مباشرة
-            document.getElementById('tgOrderBtn').href = `https://t.me/${cleanTg}?text=${encodeURIComponent(msg)}`;
+            const cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
+            document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(fullMsg)}`;
         }
 
         function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
@@ -293,7 +290,7 @@
             const pwd = prompt("أدخل كلمة المرور للوصول إلى لوحة التعديل:");
             if (pwd === ADMIN_PASSWORD) {
                 document.getElementById('adminWaNumber').value = '';
-                document.getElementById('adminTgUsername').value = '';
+                document.getElementById('adminCustomMsg').value = '';
                 document.getElementById('newTitle').value = '';
                 document.getElementById('newImage').value = '';
                 document.getElementById('newPkgName').value = '';
@@ -310,16 +307,19 @@
 
         function saveSocialLinks() {
             const wa = document.getElementById('adminWaNumber').value.trim();
-            const tg = document.getElementById('adminTgUsername').value.trim();
+            const customMsg = document.getElementById('adminCustomMsg').value.trim();
 
-            if (!wa || !tg) {
-                alert("يرجى كتابة رقم/يوزر الواتساب ومعرف التليجرام!");
+            if (!wa) {
+                alert("يرجى كتابة رقم أو يوزر الواتساب الخاص بك!");
                 return;
             }
 
-            socialLinks = { whatsapp: wa, telegram: tg };
+            socialLinks = { 
+                whatsapp: wa, 
+                customMsg: customMsg || "مرحباً، أريد طلب هذا المنتج:" 
+            };
             localStorage.setItem('4x_social_links', JSON.stringify(socialLinks));
-            alert("تم حفظ الروابط الجديدة بنجاح! 💾");
+            alert("تم حفظ إعدادات الواتساب والرسالة التلقائية بنجاح! 💾");
         }
 
         function renderAdminList() {
