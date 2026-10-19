@@ -178,8 +178,8 @@
                 <input type="text" id="newImage" placeholder="حط رابط صورة المنتج هنا">
             </div>
             <div class="form-group">
-                <label>اسم الباقة:</label>
-                <input type="text" id="newPkgName" placeholder="حط اسم الباقة هنا">
+                <label>العدد / الفئة / النوع:</label>
+                <input type="text" id="newPkgName" placeholder="مثال: قطعتين أو 60 UC">
             </div>
             <div class="form-group">
                 <label>سعر المنتج:</label>
@@ -276,9 +276,9 @@
             el.classList.add('selected');
             selectedPkg = { name, price };
 
-            // صياغة الرسالة التلقائية المخصصة
+            // تغيير كلمة الباقة إلى (العدد/الكمية)
             const headerText = socialLinks.customMsg || "مرحباً، أريد طلب هذا المنتج:";
-            const fullMsg = `${headerText}\n\n🎮 المنتج: ${selectedItem.title}\n📦 الباقة: ${name}\n💰 السعر: ${price}`;
+            const fullMsg = `${headerText}\n\n🎮 المنتج: ${selectedItem.title}\n🔢 العدد / الكمية: ${name}\n💰 السعر: ${price}`;
             
             const cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
             document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(fullMsg)}`;
