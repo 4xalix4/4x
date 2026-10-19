@@ -42,13 +42,7 @@
         .search-btn { background: var(--az-yellow); border: none; padding: 0 15px; cursor: pointer; font-weight: bold; }
 
         .header-actions { display: flex; gap: 8px; align-items: center; }
-        .contact-pill {
-            display: flex; align-items: center; gap: 5px; padding: 6px 10px;
-            border-radius: 4px; text-decoration: none; color: white; font-size: 9pt; font-weight: bold;
-        }
-        .wa-btn { background: var(--whatsapp); }
-        .tg-btn { background: var(--telegram); }
-        .admin-btn { background: var(--az-yellow); color: #000; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 9pt; }
+        .admin-btn { background: var(--az-yellow); color: #000; border: none; padding: 7px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 9.5pt; }
 
         .sub-header {
             background-color: var(--az-light-dark); color: var(--white);
@@ -103,7 +97,6 @@
         .btn-direct-wa { background: var(--whatsapp); color: white; border: none; padding: 10px; border-radius: 20px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 10pt; }
         .btn-direct-tg { background: var(--telegram); color: white; border: none; padding: 10px; border-radius: 20px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 10pt; }
         
-        /* لوحة التحكم للأدمن */
         .admin-product-row {
             display: flex; justify-content: space-between; align-items: center;
             background: #f8f9fa; padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 6px; font-size: 9pt;
@@ -120,9 +113,7 @@
             <button class="search-btn">🔍</button>
         </div>
         <div class="header-actions">
-            <button class="admin-btn" onclick="openAdminModal()">⚙️ لوحة الأدمن</button>
-            <a href="https://wa.me/9647767814099" target="_blank" class="contact-pill wa-btn">💬 واتساب</a>
-            <a href="https://t.me/x4x_Shopx" target="_blank" class="contact-pill tg-btn">✈️ تليجرام</a>
+            <button class="admin-btn" onclick="checkAdminPassword()">⚙️ تعديل المنتجات والروابط</button>
         </div>
     </header>
 
@@ -156,8 +147,22 @@
     <div class="modal-overlay" id="adminModal">
         <div class="modal-box" style="max-width: 500px;">
             <span class="close-modal" onclick="closeAdminModal()">&times;</span>
-            <h3>⚙️ لوحة التحكم - إدارة المنتجات</h3>
+            <h3>⚙️ لوحة التحكم وإدارة المتجر</h3>
             
+            <!-- قسم تعديل روابط التواصل -->
+            <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
+            <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">🔗 تعديل روابط التواصل (الواتساب والتليجرام):</h4>
+            <div class="form-group">
+                <label>رقم الواتساب (بدون + أو أصفار زادت، مثلاً 9647767814099):</label>
+                <input type="text" id="adminWaNumber" placeholder="9647767814099">
+            </div>
+            <div class="form-group">
+                <label>معرف التليجرام (مثلاً x4x_Shopx):</label>
+                <input type="text" id="adminTgUsername" placeholder="x4x_Shopx">
+            </div>
+            <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ الروابط الجديدة 💾</button>
+
+            <!-- قسم إضافة المنتجات -->
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px;">➕ إضافة منتج جديد:</h4>
             
@@ -179,7 +184,14 @@
     </div>
 
     <script>
-        // قاعدة البيانات الافتراضية أو المحفوظة مسبقاً
+        const ADMIN_PASSWORD = "1234"; // باسورد لوحة التحكم
+
+        // إعدادات وروابط التواصل المحفوظة
+        let socialLinks = JSON.parse(localStorage.getItem('4x_social_links')) || {
+            whatsapp: "9647767814099",
+            telegram: "x4x_Shopx"
+        };
+
         let storeData = JSON.parse(localStorage.getItem('4x_store_data')) || [
             {
                 id: "pubg", category: "games",
@@ -255,17 +267,47 @@
             selectedPkg = { name, price };
 
             const msg = `مرحباً، أريـد طلب هذا المنتج:\n🎮 المنتج: ${selectedItem.title}\n📦 الباقة: ${name}\n💰 السعر: ${price}`;
-            document.getElementById('waOrderBtn').href = `https://wa.me/9647767814099?text=${encodeURIComponent(msg)}`;
-            document.getElementById('tgOrderBtn').href = `https://t.me/x4x_Shopx?text=${encodeURIComponent(msg)}`;
+            
+            // استخدام الروابط المحفوظة من قبل الأدمن
+            const cleanWa = socialLinks.whatsapp.replace('+', '').trim();
+            const cleanTg = socialLinks.telegram.replace('@', '').trim();
+
+            document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`;
+            document.getElementById('tgOrderBtn').href = `https://t.me/${cleanTg}?text=${encodeURIComponent(msg)}`;
         }
 
         function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
 
-        function openAdminModal() {
-            renderAdminList();
-            document.getElementById('adminModal').style.display = 'flex';
+        function checkAdminPassword() {
+            const pwd = prompt("أدخل كلمة المرور للوصول إلى لوحة التعديل:");
+            if (pwd === ADMIN_PASSWORD) {
+                // تعبئة حقول الروابط الحالية
+                document.getElementById('adminWaNumber').value = socialLinks.whatsapp;
+                document.getElementById('adminTgUsername').value = socialLinks.telegram;
+
+                renderAdminList();
+                document.getElementById('adminModal').style.display = 'flex';
+            } else if (pwd !== null) {
+                alert("كلمة المرور غير صحيحة!");
+            }
         }
+
         function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+
+        // حفظ روابط الواتساب والتليجرام الجديدة
+        function saveSocialLinks() {
+            const wa = document.getElementById('adminWaNumber').value.trim();
+            const tg = document.getElementById('adminTgUsername').value.trim();
+
+            if (!wa || !tg) {
+                alert("يرجى إدخال رقم الواتساب ومعرف التليجرام!");
+                return;
+            }
+
+            socialLinks = { whatsapp: wa, telegram: tg };
+            localStorage.setItem('4x_social_links', JSON.stringify(socialLinks));
+            alert("تم حفظ روابط التواصل الجديدة بنجاح! 💾");
+        }
 
         function renderAdminList() {
             const list = document.getElementById('adminProductsList');
