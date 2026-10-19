@@ -66,7 +66,6 @@
         .buy-action-btn { background: var(--az-yellow); border: none; padding: 9px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; margin-top: auto; }
         .buy-action-btn:hover { background: var(--az-yellow-hover); }
 
-        /* النوافذ المنبثقة Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.7); z-index: 3000;
@@ -151,12 +150,12 @@
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">🔗 تعديل روابط التواصل (الواتساب والتليجرام):</h4>
             <div class="form-group">
-                <label>رقم أو يوزر الواتساب:</label>
-                <input type="text" id="adminWaNumber" placeholder="حط رقم الواتساب أو اليوزر هنا">
+                <label>رقم الواتساب (أو اليوزر):</label>
+                <input type="text" id="adminWaNumber" placeholder="حط رقم الواتساب هنا">
             </div>
             <div class="form-group">
-                <label>معرف التليجرام:</label>
-                <input type="text" id="adminTgUsername" placeholder="حط يوزر التليجرام هنا">
+                <label>معرف التليجرام الشخصي (وليس القناة):</label>
+                <input type="text" id="adminTgUsername" placeholder="حط يوزر حسابك الشخصي هنا (مثال: x4xalix4x)">
             </div>
             <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ الروابط 💾</button>
 
@@ -183,8 +182,8 @@
                 <input type="text" id="newPkgName" placeholder="حط اسم الباقة هنا">
             </div>
             <div class="form-group">
-                <label>سعر المنتج (اكتب الأرقام فقط):</label>
-                <input type="text" id="newPkgPrice" placeholder="مثال: 15000">
+                <label>سعر المنتج:</label>
+                <input type="text" id="newPkgPrice" placeholder="حط سعر المنتج هنا (مثال: 15000)">
             </div>
             <button class="buy-action-btn" style="background:var(--az-dark); color:white; margin-bottom: 15px;" onclick="addNewProduct()">إضافة المنتج للمتجر</button>
 
@@ -196,8 +195,9 @@
     <script>
         const ADMIN_PASSWORD = "1234";
 
+        // تعيين حسابك الشخصي للتليجرام تلقائياً لتفادي فتح القناة
         let socialLinks = JSON.parse(localStorage.getItem('4x_social_links')) || {
-            whatsapp: "4xalix4",
+            whatsapp: "07767814099",
             telegram: "x4xalix4x"
         };
 
@@ -213,13 +213,10 @@
         let selectedItem = null;
         let selectedPkg = null;
 
-        // دالة تحويل وتنسيق السعر تلقائياً إلى الإنجليزية والعملة IQD
         function formatPriceToIQD(rawPrice) {
             if (!rawPrice) return "";
-            // استخراج الأرقام فقط من المداخلات
             let cleanDigits = rawPrice.toString().replace(/[^0-9]/g, '');
             if (!cleanDigits) return rawPrice;
-            // إضافة الفواصل وتنسيق الرقم مع IQD بالإنجليزية
             let formattedNumber = Number(cleanDigits).toLocaleString('en-US');
             return `${formattedNumber} IQD`;
         }
@@ -282,10 +279,11 @@
 
             const msg = `مرحباً، أريـد طلب هذا المنتج:\n🎮 المنتج: ${selectedItem.title}\n📦 الباقة: ${name}\n💰 السعر: ${price}`;
             
-            const cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
+            const cleanWa = (socialLinks.whatsapp || "07767814099").replace('+', '').trim();
             const cleanTg = (socialLinks.telegram || "x4xalix4x").replace('@', '').trim();
 
             document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`;
+            // استخدام رابط التليجرام الخاص بالحسابات الشخصية مباشرة
             document.getElementById('tgOrderBtn').href = `https://t.me/${cleanTg}?text=${encodeURIComponent(msg)}`;
         }
 
@@ -315,7 +313,7 @@
             const tg = document.getElementById('adminTgUsername').value.trim();
 
             if (!wa || !tg) {
-                alert("يرجى كتابة رقم/يوزر الواتساب ومعرف التليجرام الخانات فارغة!");
+                alert("يرجى كتابة رقم/يوزر الواتساب ومعرف التليجرام!");
                 return;
             }
 
@@ -348,7 +346,6 @@
                 return;
             }
 
-            // تنسيق السعر تلقائياً إلى IQD بالإنجليزية
             const pkgPrice = formatPriceToIQD(rawPkgPrice);
 
             const newId = 'item_' + Date.now();
