@@ -131,7 +131,7 @@
             <h4 style="font-size:9.5pt; margin-bottom:8px;">🗑️ إدارة المنتجات:</h4>
             <div id="adminProductsList" style="max-height:150px; overflow-y:auto;"></div>
 
-            <button class="del-btn" style="width:100%; padding:8px; margin-top:10px;" onclick="resetStoreCache()">🔄 تصفير الذاكرة</button>
+            <button class="del-btn" style="width:100%; padding:8px; margin-top:10px;" onclick="resetStoreCache()">🔄 إرسال ضبط وتصفير الكل</button>
         </div>
     </div>
 
@@ -150,10 +150,12 @@
         try {
             var savedLinks = localStorage.getItem('4x_social_links');
             if (savedLinks) socialLinks = JSON.parse(savedLinks);
+            
             var savedData = localStorage.getItem('4x_store_data');
-            if (savedData) {
-                var parsed = JSON.parse(savedData);
-                if (Array.isArray(parsed) && parsed.length > 0) storeData = parsed;
+            if (savedData !== null) {
+                storeData = JSON.parse(savedData);
+            } else {
+                localStorage.setItem('4x_store_data', JSON.stringify(defaultProducts));
             }
         } catch (e) { storeData = defaultProducts; }
 
@@ -171,7 +173,7 @@
             if (!grid) return;
             grid.innerHTML = '';
             if (!items || items.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777;">لا توجد منتجات حالياً.</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777; padding:20px;">لا توجد منتجات متوفرة حالياً.</p>';
                 return;
             }
             for (var i = 0; i < items.length; i++) {
@@ -300,7 +302,10 @@
         }
 
         function resetStoreCache() {
-            if (confirm('تصفير ذاكرة المتصفح؟')) { localStorage.clear(); location.reload(); }
+            if (confirm('تصفير ذاكرة المتصفح للبدء بمنتجات جديدة؟')) { 
+                localStorage.removeItem('4x_store_data'); 
+                location.reload(); 
+            }
         }
 
         function searchProducts() {
