@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- منع التخزين المؤقت لضمان التحديث الفوري -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <title>4X IRAQ | المتجر الشامل للألعاب وقطع الحاسبات</title>
     <style>
         :root {
@@ -29,7 +34,6 @@
             justify-content: space-between; flex-wrap: wrap; gap: 15px;
         }
 
-        /* جعل اللوجو قابلاً للضغط كزر مخفي للأدمن */
         .logo-area { 
             font-size: 18pt; font-weight: bold; color: var(--white); 
             display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;
@@ -66,7 +70,6 @@
         .buy-action-btn { background: var(--az-yellow); border: none; padding: 9px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; margin-top: auto; }
         .buy-action-btn:hover { background: var(--az-yellow-hover); }
 
-        /* النوافذ المنبثقة Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.7); z-index: 3000;
@@ -87,7 +90,6 @@
         .modal-pkg-item.selected { border-color: #B12704; background: #fff8f5; }
         .modal-pkg-item .pkg-p { color: #B12704; font-weight: bold; direction: ltr; }
 
-        /* أزرار زيادة ونقصان الكمية */
         .quantity-control {
             display: flex; align-items: center; justify-content: space-between;
             background: #f7f7f7; border: 1px solid var(--border-color); border-radius: 6px;
@@ -124,7 +126,6 @@
 <body>
 
     <header>
-        <!-- الضغط على اللوجو يفتح لوحة الأدمن المخفية -->
         <div class="logo-area" onclick="checkAdminPassword()" title="4X IRAQ">4X <span>IRAQ</span> 🛒</div>
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="ابحث عن منتج..." onkeyup="searchProducts()">
@@ -150,7 +151,6 @@
             <h3 id="modalTitle">شراء المنتج</h3>
             <div class="modal-packages" id="modalPackagesList"></div>
 
-            <!-- عداد الكمية (+ / -) -->
             <div class="quantity-control">
                 <span style="font-size: 9.5pt; font-weight: bold;">تحديد الكمية المطلوبة:</span>
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -176,7 +176,6 @@
             <span class="close-modal" onclick="closeAdminModal()">&times;</span>
             <h3>⚙️ لوحة التحكم وإدارة المتجر</h3>
             
-            <!-- قسم تعديل رقم الواتساب والرسالة التلقائية -->
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">💬 إعدادات الواتساب والرسالة التلقائية:</h4>
             <div class="form-group">
@@ -189,7 +188,6 @@
             </div>
             <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ إعدادات الواتساب 💾</button>
 
-            <!-- قسم إضافة المنتجات -->
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px;">➕ إضافة منتج جديد:</h4>
             
@@ -220,11 +218,13 @@
 
             <h4 style="font-size: 10pt; margin-bottom: 8px;">🗑️ المنتجات الحالية (حذف):</h4>
             <div id="adminProductsList" style="max-height: 180px; overflow-y: auto;"></div>
+
+            <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
+            <button class="del-btn" style="width: 100%; padding: 10px; font-weight: bold;" onclick="resetStoreCache()">🔄 إعادة ضبط وتصفير البيانات القديمة</button>
         </div>
     </div>
 
     <script>
-        // كلمة المرور الجديدة الخاصة بك
         const ADMIN_PASSWORD = "xx4xx";
 
         let currentQty = 1;
@@ -333,7 +333,6 @@
 
         function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
 
-        // فتح لوحة الأدمن عند النقر على اسم المتجر (4X IRAQ)
         function checkAdminPassword() {
             const pwd = prompt("أدخل كلمة المرور السرية للوصول إلى لوحة التعديل:");
             if (pwd === ADMIN_PASSWORD) {
@@ -410,5 +409,4 @@
             renderAdminList();
 
             document.getElementById('newTitle').value = '';
-            document.getElementById('newImage').value = '';
-            document.getElementById('n
+            document.getElementById('newImage').value =
