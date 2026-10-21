@@ -22,101 +22,319 @@
             --danger: #cc0000;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; text-align: right; }
-        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            text-align: right;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
 
         header {
-            background-color: var(--az-dark); color: var(--white);
-            padding: 10px 20px; display: flex; align-items: center;
-            justify-content: space-between; flex-wrap: wrap; gap: 15px;
+            background-color: var(--az-dark);
+            color: var(--white);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .logo-area { 
-            font-size: 18pt; font-weight: bold; color: var(--white); 
-            display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;
+            font-size: 18pt;
+            font-weight: bold;
+            color: var(--white); 
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            user-select: none;
         }
-        .logo-area span { color: var(--az-yellow); }
+        .logo-area span {
+            color: var(--az-yellow);
+        }
 
         .search-bar {
-            flex-grow: 1; max-width: 500px; display: flex; background: var(--white);
-            border-radius: 4px; overflow: hidden; border: 2px solid transparent;
+            flex-grow: 1;
+            max-width: 500px;
+            display: flex;
+            background: var(--white);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 2px solid transparent;
         }
-        .search-bar:focus-within { border-color: var(--az-yellow); }
-        .search-bar input { width: 100%; padding: 9px 12px; border: none; outline: none; font-size: 10pt; text-align: right; }
-        .search-btn { background: var(--az-yellow); border: none; padding: 0 15px; cursor: pointer; font-weight: bold; }
+        .search-bar:focus-within {
+            border-color: var(--az-yellow);
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 9px 12px;
+            border: none;
+            outline: none;
+            font-size: 10pt;
+            text-align: right;
+        }
+        .search-btn {
+            background: var(--az-yellow);
+            border: none;
+            padding: 0 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
         .sub-header {
-            background-color: var(--az-light-dark); color: var(--white);
-            padding: 8px 20px; display: flex; gap: 20px; font-size: 9.5pt; overflow-x: auto;
+            background-color: var(--az-light-dark);
+            color: var(--white);
+            padding: 8px 20px;
+            display: flex;
+            gap: 20px;
+            font-size: 9.5pt;
+            overflow-x: auto;
         }
-        .sub-header span { cursor: pointer; white-space: nowrap; }
-        .sub-header span:hover { color: var(--az-yellow); }
+        .sub-header span {
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .sub-header span:hover {
+            color: var(--az-yellow);
+        }
 
-        .container { max-width: 1300px; margin: 20px auto; padding: 0 15px; }
-        .section-title { font-size: 14pt; margin-bottom: 15px; font-weight: bold; color: var(--az-dark); border-right: 4px solid var(--az-yellow); padding-right: 10px; }
+        .container {
+            max-width: 1300px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        .section-title {
+            font-size: 14pt;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: var(--az-dark);
+            border-right: 4px solid var(--az-yellow);
+            padding-right: 10px;
+        }
 
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 15px; margin-bottom: 40px; }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
 
         .product-card {
-            background: var(--white); border: 1px solid var(--border-color);
-            border-radius: 8px; padding: 12px; display: flex; flex-direction: column; position: relative;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
-        .product-img { width: 100%; height: 150px; object-fit: contain; margin-bottom: 10px; background: #f7f7f7; border-radius: 4px; }
-        .product-title { font-size: 10.5pt; font-weight: bold; color: var(--text-main); margin-bottom: 6px; height: 38px; overflow: hidden; }
-        .product-price { font-size: 12pt; font-weight: bold; color: #B12704; margin-bottom: 10px; direction: ltr; text-align: right; }
-        .buy-action-btn { background: var(--az-yellow); border: none; padding: 9px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; margin-top: auto; }
-        .buy-action-btn:hover { background: var(--az-yellow-hover); }
+        .product-img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            background: #f7f7f7;
+            border-radius: 4px;
+        }
+        .product-title {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            height: 38px;
+            overflow: hidden;
+        }
+        .product-price {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #B12704;
+            margin-bottom: 10px;
+            direction: ltr;
+            text-align: right;
+        }
+        .buy-action-btn {
+            background: var(--az-yellow);
+            border: none;
+            padding: 9px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            margin-top: auto;
+        }
+        .buy-action-btn:hover {
+            background: var(--az-yellow-hover);
+        }
 
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7); z-index: 3000;
-            display: none; justify-content: center; align-items: center; padding: 15px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
         }
         .modal-box {
-            background: var(--white); color: var(--text-main); border-radius: 8px;
-            width: 100%; max-width: 420px; padding: 20px; position: relative; max-height: 90vh; overflow-y: auto;
+            background: var(--white);
+            color: var(--text-main);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        .close-modal { position: absolute; top: 10px; left: 15px; font-size: 16pt; cursor: pointer; color: var(--text-light); }
-        .modal-box h3 { margin-bottom: 12px; color: var(--az-dark); font-size: 13pt; }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 16pt;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+        .modal-box h3 {
+            margin-bottom: 12px;
+            color: var(--az-dark);
+            font-size: 13pt;
+        }
 
-        .modal-packages { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-        .modal-pkg-item {
-            border: 1px solid var(--border-color); padding: 9px 12px; border-radius: 6px;
-            display: flex; justify-content: space-between; cursor: pointer; background: #fafafa; font-size: 10pt;
+        .modal-packages {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
         }
-        .modal-pkg-item.selected { border-color: #B12704; background: #fff8f5; }
-        .modal-pkg-item .pkg-p { color: #B12704; font-weight: bold; direction: ltr; }
+        .modal-pkg-item {
+            border: 1px solid var(--border-color);
+            padding: 9px 12px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+            background: #fafafa;
+            font-size: 10pt;
+        }
+        .modal-pkg-item.selected {
+            border-color: #B12704;
+            background: #fff8f5;
+        }
+        .modal-pkg-item .pkg-p {
+            color: #B12704;
+            font-weight: bold;
+            direction: ltr;
+        }
 
         .quantity-control {
-            display: flex; align-items: center; justify-content: space-between;
-            background: #f7f7f7; border: 1px solid var(--border-color); border-radius: 6px;
-            padding: 8px 12px; margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f7f7f7;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
         }
         .quantity-btn {
-            background: var(--az-yellow); border: none; width: 32px; height: 32px;
-            border-radius: 50%; font-size: 14pt; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            background: var(--az-yellow);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 14pt;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .quantity-number { font-size: 12pt; font-weight: bold; color: var(--az-dark); }
+        .quantity-number {
+            font-size: 12pt;
+            font-weight: bold;
+            color: var(--az-dark);
+        }
 
         .payment-info-box {
-            background: #f0f8ff; border: 1px solid #b8daff; border-radius: 6px; padding: 10px; margin-bottom: 12px; font-size: 9.5pt; color: #004085; text-align: center;
+            background: #f0f8ff;
+            border: 1px solid #b8daff;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 9.5pt;
+            color: #004085;
+            text-align: center;
         }
 
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 9pt; color: var(--text-light); margin-bottom: 4px; }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 9pt;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
         .form-group input, .form-group select {
-            width: 100%; padding: 9px; border: 1px solid var(--border-color); border-radius: 4px; outline: none; font-size: 9.5pt;
+            width: 100%;
+            padding: 9px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            font-size: 9.5pt;
         }
 
-        .modal-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-        .btn-direct-wa { background: var(--whatsapp); color: white; border: none; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 11pt; }
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .btn-direct-wa {
+            background: var(--whatsapp);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 11pt;
+        }
         
         .admin-product-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #f8f9fa; padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 6px; font-size: 9pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            font-size: 9pt;
         }
-        .del-btn { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .del-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -226,30 +444,39 @@
 
         var defaultProducts = [
             {
-                id: "pubg", category: "games",
+                id: "pubg",
+                category: "games",
                 title: "شدات ببجي موبايل (PUBG Mobile UC)",
                 image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500",
                 packages: [{ name: "60 UC", price: "1,500 IQD" }]
             },
             {
-                id: "gpu_rx580", category: "hardware",
+                id: "gpu_rx580",
+                category: "hardware",
                 title: "كرت شاشة AMD Radeon RX 580 8GB",
                 image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=500",
                 packages: [{ name: "نسخة ممتازة", price: "85,000 IQD" }]
             }
         ];
 
-        var socialLinks = { whatsapp: "4xalix4", customMsg: "مرحباً متجر 4X IRAQ، أريد شراء المنتج التالي:" };
+        var socialLinks = {
+            whatsapp: "4xalix4",
+            customMsg: "مرحباً متجر 4X IRAQ، أريد شراء المنتج التالي:"
+        };
         var storeData = defaultProducts;
 
         try {
             var savedLinks = localStorage.getItem('4x_social_links');
-            if (savedLinks) socialLinks = JSON.parse(savedLinks);
+            if (savedLinks) {
+                socialLinks = JSON.parse(savedLinks);
+            }
 
             var savedData = localStorage.getItem('4x_store_data');
             if (savedData) {
                 var parsed = JSON.parse(savedData);
-                if (Array.isArray(parsed) && parsed.length > 0) storeData = parsed;
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    storeData = parsed;
+                }
             }
         } catch (e) {
             storeData = defaultProducts;
@@ -276,23 +503,30 @@
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
                 var priceText = (item.packages && item.packages[0]) ? item.packages[0].price : '';
-                grid.innerHTML += '<div class="product-card">' +
-                    '<img src="' + item.image + '" class="product-img" alt="' + item.title + '" onerror="this.src=\'https://via.placeholder.com/200?text=4X+IRAQ\'">' +
-                    '<div class="product-title">' + item.title + '</div>' +
-                    '<div class="product-price">' + priceText + '</div>' +
-                    '<button class="buy-action-btn" onclick="openModal(\'' + item.id + '\')">شراء الآن 🛒</button>' +
-                    '</div>';
+                var htmlCard = '<div class="product-card">';
+                htmlCard += '<img src="' + item.image + '" class="product-img" alt="' + item.title + '" onerror="this.src=\'https://via.placeholder.com/200?text=4X+IRAQ\'">';
+                htmlCard += '<div class="product-title">' + item.title + '</div>';
+                htmlCard += '<div class="product-price">' + priceText + '</div>';
+                htmlCard += '<button class="buy-action-btn" onclick="openModal(\'' + item.id + '\')">شراء الآن 🛒</button>';
+                htmlCard += '</div>';
+                grid.innerHTML += htmlCard;
             }
         }
 
         function filterCategory(cat) {
-            document.getElementById('sectionTitle').innerText = cat === 'games' ? 'قسم شحن الألعاب' : (cat === 'hardware' ? 'قسم قطع الحاسبات وهاردوير' : 'جميع المنتجات والخدمات');
+            var title = 'جميع المنتجات والخدمات';
+            if (cat === 'games') title = 'قسم شحن الألعاب';
+            if (cat === 'hardware') title = 'قسم قطع الحاسبات وهاردوير';
+            document.getElementById('sectionTitle').innerText = title;
+
             if (cat === 'all') {
                 renderProducts(storeData);
             } else {
                 var filtered = [];
                 for (var i = 0; i < storeData.length; i++) {
-                    if (storeData[i].category === cat) filtered.push(storeData[i]);
+                    if (storeData[i].category === cat) {
+                        filtered.push(storeData[i]);
+                    }
                 }
                 renderProducts(filtered);
             }
@@ -318,10 +552,11 @@
             for (var j = 0; j < selectedItem.packages.length; j++) {
                 var pkg = selectedItem.packages[j];
                 var isSel = (j === 0) ? 'selected' : '';
-                pkgList.innerHTML += '<div class="modal-pkg-item ' + isSel + '" onclick="selectPkg(this, \'' + pkg.name + '\', \'' + pkg.price + '\')">' +
-                    '<span><strong>' + pkg.name + '</strong></span>' +
-                    '<span class="pkg-p">' + pkg.price + '</span>' +
-                    '</div>';
+                var htmlPkg = '<div class="modal-pkg-item ' + isSel + '" onclick="selectPkg(this, \'' + pkg.name + '\', \'' + pkg.price + '\')">';
+                htmlPkg += '<span><strong>' + pkg.name + '</strong></span>';
+                htmlPkg += '<span class="pkg-p">' + pkg.price + '</span>';
+                htmlPkg += '</div>';
+                pkgList.innerHTML += htmlPkg;
             }
 
             if (selectedItem.packages.length > 0) {
@@ -340,67 +575,9 @@
 
         function selectPkg(el, name, price) {
             var items = document.querySelectorAll('.modal-pkg-item');
-            for (var i = 0; i < items.length; i++) items[i].classList.remove('selected');
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.remove('selected');
+            }
             if (el) el.classList.add('selected');
             selectedPkg = { name: name, price: price };
             updateWaLink();
-        }
-
-        function updateWaLink() {
-            var headerText = socialLinks.customMsg || "مرحباً، أريد طلب هذا المنتج:";
-            var fullMsg = headerText + "\n\n🎮 المنتج: " + selectedItem.title + "\n📦 الفئة/النوع: " + selectedPkg.name + "\n🔢 الكمية المطلوبة: (" + currentQty + ")\n💰 السعر الفردي: " + selectedPkg.price + "\n💳 طريقة الدفع: الماستر كارد / كاش مع المندوب عند الاستلام";
-            var cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
-            document.getElementById('waOrderBtn').href = "https://wa.me/" + cleanWa + "?text=" + encodeURIComponent(fullMsg);
-        }
-
-        function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
-
-        function checkAdminPassword() {
-            var pwd = prompt("أدخل كلمة المرور السرية للوصول إلى لوحة التعديل:");
-            if (pwd === ADMIN_PASSWORD) {
-                document.getElementById('adminWaNumber').value = '';
-                document.getElementById('adminCustomMsg').value = '';
-                document.getElementById('newTitle').value = '';
-                document.getElementById('newImage').value = '';
-                document.getElementById('newPkgName').value = '';
-                document.getElementById('newPkgPrice').value = '';
-
-                renderAdminList();
-                document.getElementById('adminModal').style.display = 'flex';
-            } else if (pwd !== null) {
-                alert("كلمة المرور غير صحيحة!");
-            }
-        }
-
-        function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
-
-        function saveSocialLinks() {
-            var wa = document.getElementById('adminWaNumber').value.trim();
-            var customMsg = document.getElementById('adminCustomMsg').value.trim();
-
-            if (!wa) {
-                alert("يرجى كتابة رقم أو يوزر الواتساب الخاص بك!");
-                return;
-            }
-
-            socialLinks = { whatsapp: wa, customMsg: customMsg || "مرحباً، أريد طلب هذا المنتج:" };
-            localStorage.setItem('4x_social_links', JSON.stringify(socialLinks));
-            alert("تم حفظ إعدادات الواتساب بنجاح! 💾");
-        }
-
-        function renderAdminList() {
-            var list = document.getElementById('adminProductsList');
-            list.innerHTML = '';
-            for (var i = 0; i < storeData.length; i++) {
-                var item = storeData[i];
-                list.innerHTML += '<div class="admin-product-row">' +
-                    '<span>' + item.title + '</span>' +
-                    '<button class="del-btn" onclick="deleteProduct(\'' + item.id + '\')">حذف</button>' +
-                    '</div>';
-            }
-        }
-
-        function addNewProduct() {
-            var title = document.getElementById('newTitle').value.trim();
-            var category = document.getElementById('newCategory').value;
-            var image 
