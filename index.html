@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- منع التخزين المؤقت لضمان التحديث الفوري -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -251,13 +250,13 @@
             let cleanDigits = rawPrice.toString().replace(/[^0-9]/g, '');
             if (!cleanDigits) return rawPrice;
             let formattedNumber = Number(cleanDigits).toLocaleString('en-US');
-            return `${formattedNumber} IQD`;
+            return formattedNumber + " IQD";
         }
 
         function renderProducts(items) {
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
-            if(items.length === 0) {
+            if(!items || items.length === 0) {
                 grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777; padding:20px;">لا توجد منتجات متوفرة حالياً.</p>';
                 return;
             }
@@ -266,7 +265,7 @@
                     <div class="product-card">
                         <img src="${item.image}" class="product-img" alt="${item.title}" onerror="this.src='https://via.placeholder.com/200?text=4X+IRAQ'">
                         <div class="product-title">${item.title}</div>
-                        <div class="product-price">${item.packages[0] ? item.packages[0].price : ''}</div>
+                        <div class="product-price">${item.packages && item.packages[0] ? item.packages[0].price : ''}</div>
                         <button class="buy-action-btn" onclick="openModal('${item.id}')">شراء الآن 🛒</button>
                     </div>`;
             });
@@ -325,10 +324,10 @@
 
         function updateWaLink() {
             const headerText = socialLinks.customMsg || "مرحباً، أريد طلب هذا المنتج:";
-            const fullMsg = `${headerText}\n\n🎮 المنتج: ${selectedItem.title}\n📦 الفئة/النوع: ${selectedPkg.name}\n🔢 الكمية المطلوبة: (${currentQty})\n💰 السعر الفردي: ${selectedPkg.price}\n💳 طريقة الدفع: الماستر كارد / كاش مع المندوب عند الاستلام`;
+            const fullMsg = headerText + "\n\n🎮 المنتج: " + selectedItem.title + "\n📦 الفئة/النوع: " + selectedPkg.name + "\n🔢 الكمية المطلوبة: (" + currentQty + ")\n💰 السعر الفردي: " + selectedPkg.price + "\n💳 طريقة الدفع: الماستر كارد / كاش مع المندوب عند الاستلام";
             
             const cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
-            document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(fullMsg)}`;
+            document.getElementById('waOrderBtn').href = "https://wa.me/" + cleanWa + "?text=" + encodeURIComponent(fullMsg);
         }
 
         function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
@@ -409,4 +408,4 @@
             renderAdminList();
 
             document.getElementById('newTitle').value = '';
-            document.getElementById('newImage').value =
+            document.getElementById('newImage').value = 
