@@ -29,7 +29,11 @@
             justify-content: space-between; flex-wrap: wrap; gap: 15px;
         }
 
-        .logo-area { font-size: 18pt; font-weight: bold; color: var(--white); display: flex; align-items: center; gap: 5px; }
+        /* جعل اللوجو قابلاً للضغط كزر مخفي للأدمن */
+        .logo-area { 
+            font-size: 18pt; font-weight: bold; color: var(--white); 
+            display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;
+        }
         .logo-area span { color: var(--az-yellow); }
 
         .search-bar {
@@ -39,9 +43,6 @@
         .search-bar:focus-within { border-color: var(--az-yellow); }
         .search-bar input { width: 100%; padding: 9px 12px; border: none; outline: none; font-size: 10pt; text-align: right; }
         .search-btn { background: var(--az-yellow); border: none; padding: 0 15px; cursor: pointer; font-weight: bold; }
-
-        .header-actions { display: flex; gap: 8px; align-items: center; }
-        .admin-btn { background: var(--az-yellow); color: #000; border: none; padding: 7px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 9.5pt; }
 
         .sub-header {
             background-color: var(--az-light-dark); color: var(--white);
@@ -86,6 +87,20 @@
         .modal-pkg-item.selected { border-color: #B12704; background: #fff8f5; }
         .modal-pkg-item .pkg-p { color: #B12704; font-weight: bold; direction: ltr; }
 
+        /* أزرار زيادة ونقصان الكمية */
+        .quantity-control {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #f7f7f7; border: 1px solid var(--border-color); border-radius: 6px;
+            padding: 8px 12px; margin-bottom: 12px;
+        }
+        .quantity-btn {
+            background: var(--az-yellow); border: none; width: 32px; height: 32px;
+            border-radius: 50%; font-size: 14pt; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .quantity-btn:hover { background: var(--az-yellow-hover); }
+        .quantity-number { font-size: 12pt; font-weight: bold; color: var(--az-dark); }
+
         .payment-info-box {
             background: #f0f8ff; border: 1px solid #b8daff; border-radius: 6px; padding: 10px; margin-bottom: 12px; font-size: 9.5pt; color: #004085; text-align: center;
         }
@@ -109,13 +124,11 @@
 <body>
 
     <header>
-        <div class="logo-area">4X <span>IRAQ</span> 🛒</div>
+        <!-- الضغط على اللوجو يفتح لوحة الأدمن المخفية -->
+        <div class="logo-area" onclick="checkAdminPassword()" title="4X IRAQ">4X <span>IRAQ</span> 🛒</div>
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="ابحث عن منتج..." onkeyup="searchProducts()">
             <button class="search-btn">🔍</button>
-        </div>
-        <div class="header-actions">
-            <button class="admin-btn" onclick="checkAdminPassword()">⚙️ لوحة التعديل</button>
         </div>
     </header>
 
@@ -137,6 +150,16 @@
             <h3 id="modalTitle">شراء المنتج</h3>
             <div class="modal-packages" id="modalPackagesList"></div>
 
+            <!-- عداد الكمية (+ / -) -->
+            <div class="quantity-control">
+                <span style="font-size: 9.5pt; font-weight: bold;">تحديد الكمية المطلوبة:</span>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+                    <span class="quantity-number" id="qtyDisplay">1</span>
+                    <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                </div>
+            </div>
+
             <div class="payment-info-box">
                 💳 <strong>طريقة الدفع:</strong> كاش أو بالماستر كارد مباشر مع المندوب عند الاستلام.
             </div>
@@ -147,12 +170,13 @@
         </div>
     </div>
 
-    <!-- نافذة لوحة التحكم (الأدمن) -->
+    <!-- نافذة لوحة التحكم (الأدمن المخفية) -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-box" style="max-width: 500px;">
             <span class="close-modal" onclick="closeAdminModal()">&times;</span>
             <h3>⚙️ لوحة التحكم وإدارة المتجر</h3>
             
+            <!-- قسم تعديل رقم الواتساب والرسالة التلقائية -->
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">💬 إعدادات الواتساب والرسالة التلقائية:</h4>
             <div class="form-group">
@@ -165,6 +189,7 @@
             </div>
             <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ إعدادات الواتساب 💾</button>
 
+            <!-- قسم إضافة المنتجات -->
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
             <h4 style="font-size: 10pt; margin-bottom: 8px;">➕ إضافة منتج جديد:</h4>
             
@@ -184,8 +209,8 @@
                 <input type="text" id="newImage" placeholder="حط رابط صورة المنتج هنا">
             </div>
             <div class="form-group">
-                <label>العدد / الفئة / النوع:</label>
-                <input type="text" id="newPkgName" placeholder="مثال: قطعتين أو 60 UC">
+                <label>نوع / فئة المنتج:</label>
+                <input type="text" id="newPkgName" placeholder="مثال: قطعة واحدة أو 60 UC">
             </div>
             <div class="form-group">
                 <label>سعر المنتج:</label>
@@ -199,7 +224,10 @@
     </div>
 
     <script>
-        const ADMIN_PASSWORD = "1234";
+        // كلمة المرور الجديدة الخاصة بك
+        const ADMIN_PASSWORD = "xx4xx";
+
+        let currentQty = 1;
 
         let socialLinks = JSON.parse(localStorage.getItem('4x_social_links')) || {
             whatsapp: "4xalix4",
@@ -257,6 +285,8 @@
         function openModal(itemId) {
             selectedItem = storeData.find(i => i.id === itemId);
             selectedPkg = null;
+            currentQty = 1;
+            document.getElementById('qtyDisplay').innerText = currentQty;
 
             document.getElementById('modalTitle').innerText = selectedItem.title;
             const pkgList = document.getElementById('modalPackagesList');
@@ -277,13 +307,25 @@
             document.getElementById('buyModal').style.display = 'flex';
         }
 
+        function changeQuantity(change) {
+            currentQty += change;
+            if (currentQty < 1) currentQty = 1;
+            document.getElementById('qtyDisplay').innerText = currentQty;
+            if (selectedPkg) {
+                updateWaLink();
+            }
+        }
+
         function selectPkg(el, name, price) {
             document.querySelectorAll('.modal-pkg-item').forEach(e => e.classList.remove('selected'));
-            el.classList.add('selected');
+            if(el) el.classList.add('selected');
             selectedPkg = { name, price };
+            updateWaLink();
+        }
 
+        function updateWaLink() {
             const headerText = socialLinks.customMsg || "مرحباً، أريد طلب هذا المنتج:";
-            const fullMsg = `${headerText}\n\n🎮 المنتج: ${selectedItem.title}\n🔢 العدد / الكمية: ${name}\n💰 السعر: ${price}\n💳 طريقة الدفع: الماستر كارد / كاش مع المندوب عند الاستلام`;
+            const fullMsg = `${headerText}\n\n🎮 المنتج: ${selectedItem.title}\n📦 الفئة/النوع: ${selectedPkg.name}\n🔢 الكمية المطلوبة: (${currentQty})\n💰 السعر الفردي: ${selectedPkg.price}\n💳 طريقة الدفع: الماستر كارد / كاش مع المندوب عند الاستلام`;
             
             const cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
             document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(fullMsg)}`;
@@ -291,8 +333,9 @@
 
         function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
 
+        // فتح لوحة الأدمن عند النقر على اسم المتجر (4X IRAQ)
         function checkAdminPassword() {
-            const pwd = prompt("أدخل كلمة المرور للوصول إلى لوحة التعديل:");
+            const pwd = prompt("أدخل كلمة المرور السرية للوصول إلى لوحة التعديل:");
             if (pwd === ADMIN_PASSWORD) {
                 document.getElementById('adminWaNumber').value = '';
                 document.getElementById('adminCustomMsg').value = '';
@@ -368,27 +411,4 @@
 
             document.getElementById('newTitle').value = '';
             document.getElementById('newImage').value = '';
-            document.getElementById('newPkgName').value = '';
-            document.getElementById('newPkgPrice').value = '';
-            alert('تمت إضافة المنتج بنجاح إلى المتجر!');
-        }
-
-        function deleteProduct(id) {
-            if(confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                storeData = storeData.filter(i => i.id !== id);
-                localStorage.setItem('4x_store_data', JSON.stringify(storeData));
-                renderProducts(storeData);
-                renderAdminList();
-            }
-        }
-
-        function searchProducts() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = storeData.filter(i => i.title.toLowerCase().includes(query));
-            renderProducts(filtered);
-        }
-
-        window.onload = () => renderProducts(storeData);
-    </script>
-</body>
-</html>
+            document.getElementById('n
