@@ -1,1 +1,414 @@
-.
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4X IRAQ | المتجر الشامل للألعاب وقطع الحاسبات</title>
+    <style>
+        :root {
+            --az-dark: #131921;
+            --az-light-dark: #232f3e;
+            --az-yellow: #febd69;
+            --az-yellow-hover: #f3a847;
+            --bg-color: #eaeded;
+            --text-main: #0F1111;
+            --text-light: #565959;
+            --white: #ffffff;
+            --whatsapp: #25d366;
+            --border-color: #d5d9d9;
+            --danger: #cc0000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; text-align: right; }
+
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; }
+
+        header {
+            background-color: var(--az-dark); color: var(--white);
+            padding: 10px 20px; display: flex; align-items: center;
+            justify-content: space-between; flex-wrap: wrap; gap: 15px;
+        }
+
+        /* جعل اللوجو قابلاً للضغط كزر مخفي للأدمن */
+        .logo-area { 
+            font-size: 18pt; font-weight: bold; color: var(--white); 
+            display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;
+        }
+        .logo-area span { color: var(--az-yellow); }
+
+        .search-bar {
+            flex-grow: 1; max-width: 500px; display: flex; background: var(--white);
+            border-radius: 4px; overflow: hidden; border: 2px solid transparent;
+        }
+        .search-bar:focus-within { border-color: var(--az-yellow); }
+        .search-bar input { width: 100%; padding: 9px 12px; border: none; outline: none; font-size: 10pt; text-align: right; }
+        .search-btn { background: var(--az-yellow); border: none; padding: 0 15px; cursor: pointer; font-weight: bold; }
+
+        .sub-header {
+            background-color: var(--az-light-dark); color: var(--white);
+            padding: 8px 20px; display: flex; gap: 20px; font-size: 9.5pt; overflow-x: auto;
+        }
+        .sub-header span { cursor: pointer; white-space: nowrap; }
+        .sub-header span:hover { color: var(--az-yellow); }
+
+        .container { max-width: 1300px; margin: 20px auto; padding: 0 15px; }
+        .section-title { font-size: 14pt; margin-bottom: 15px; font-weight: bold; color: var(--az-dark); border-right: 4px solid var(--az-yellow); padding-right: 10px; }
+
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 15px; margin-bottom: 40px; }
+
+        .product-card {
+            background: var(--white); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 12px; display: flex; flex-direction: column; position: relative;
+        }
+        .product-img { width: 100%; height: 150px; object-fit: contain; margin-bottom: 10px; background: #f7f7f7; border-radius: 4px; }
+        .product-title { font-size: 10.5pt; font-weight: bold; color: var(--text-main); margin-bottom: 6px; height: 38px; overflow: hidden; }
+        .product-price { font-size: 12pt; font-weight: bold; color: #B12704; margin-bottom: 10px; direction: ltr; text-align: right; }
+        .buy-action-btn { background: var(--az-yellow); border: none; padding: 9px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; margin-top: auto; }
+        .buy-action-btn:hover { background: var(--az-yellow-hover); }
+
+        /* النوافذ المنبثقة Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); z-index: 3000;
+            display: none; justify-content: center; align-items: center; padding: 15px;
+        }
+        .modal-box {
+            background: var(--white); color: var(--text-main); border-radius: 8px;
+            width: 100%; max-width: 420px; padding: 20px; position: relative; max-height: 90vh; overflow-y: auto;
+        }
+        .close-modal { position: absolute; top: 10px; left: 15px; font-size: 16pt; cursor: pointer; color: var(--text-light); }
+        .modal-box h3 { margin-bottom: 12px; color: var(--az-dark); font-size: 13pt; }
+
+        .modal-packages { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .modal-pkg-item {
+            border: 1px solid var(--border-color); padding: 9px 12px; border-radius: 6px;
+            display: flex; justify-content: space-between; cursor: pointer; background: #fafafa; font-size: 10pt;
+        }
+        .modal-pkg-item.selected { border-color: #B12704; background: #fff8f5; }
+        .modal-pkg-item .pkg-p { color: #B12704; font-weight: bold; direction: ltr; }
+
+        /* أزرار زيادة ونقصان الكمية */
+        .quantity-control {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #f7f7f7; border: 1px solid var(--border-color); border-radius: 6px;
+            padding: 8px 12px; margin-bottom: 12px;
+        }
+        .quantity-btn {
+            background: var(--az-yellow); border: none; width: 32px; height: 32px;
+            border-radius: 50%; font-size: 14pt; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .quantity-btn:hover { background: var(--az-yellow-hover); }
+        .quantity-number { font-size: 12pt; font-weight: bold; color: var(--az-dark); }
+
+        .payment-info-box {
+            background: #f0f8ff; border: 1px solid #b8daff; border-radius: 6px; padding: 10px; margin-bottom: 12px; font-size: 9.5pt; color: #004085; text-align: center;
+        }
+
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 9pt; color: var(--text-light); margin-bottom: 4px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 9px; border: 1px solid var(--border-color); border-radius: 4px; outline: none; font-size: 9.5pt;
+        }
+
+        .modal-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .btn-direct-wa { background: var(--whatsapp); color: white; border: none; padding: 12px; border-radius: 20px; font-weight: bold; cursor: pointer; text-decoration: none; text-align: center; font-size: 11pt; }
+        
+        .admin-product-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f8f9fa; padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 6px; font-size: 9pt;
+        }
+        .del-btn { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <!-- الضغط على اللوجو يفتح لوحة الأدمن المخفية -->
+        <div class="logo-area" onclick="checkAdminPassword()" title="4X IRAQ">4X <span>IRAQ</span> 🛒</div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="ابحث عن منتج..." onkeyup="searchProducts()">
+            <button class="search-btn">🔍</button>
+        </div>
+    </header>
+
+    <div class="sub-header">
+        <span onclick="filterCategory('all')">🔥 الكل</span>
+        <span onclick="filterCategory('games')">🎮 شحن الألعاب</span>
+        <span onclick="filterCategory('hardware')">💻 قطع الحاسبات وهاردوير</span>
+    </div>
+
+    <div class="container">
+        <div class="section-title" id="sectionTitle">جميع المنتجات والخدمات</div>
+        <div class="products-grid" id="productsGrid"></div>
+    </div>
+
+    <!-- نافذة الشراء والتواصل -->
+    <div class="modal-overlay" id="buyModal">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">شراء المنتج</h3>
+            <div class="modal-packages" id="modalPackagesList"></div>
+
+            <!-- عداد الكمية (+ / -) -->
+            <div class="quantity-control">
+                <span style="font-size: 9.5pt; font-weight: bold;">تحديد الكمية المطلوبة:</span>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+                    <span class="quantity-number" id="qtyDisplay">1</span>
+                    <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                </div>
+            </div>
+
+            <div class="payment-info-box">
+                💳 <strong>طريقة الدفع:</strong> كاش أو بالماستر كارد مباشر مع المندوب عند الاستلام.
+            </div>
+            
+            <div class="modal-buttons">
+                <a id="waOrderBtn" href="#" target="_blank" class="btn-direct-wa">إتمام الطلب عبر واتساب 💬</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة لوحة التحكم (الأدمن المخفية) -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-box" style="max-width: 500px;">
+            <span class="close-modal" onclick="closeAdminModal()">&times;</span>
+            <h3>⚙️ لوحة التحكم وإدارة المتجر</h3>
+            
+            <!-- قسم تعديل رقم الواتساب والرسالة التلقائية -->
+            <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
+            <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">💬 إعدادات الواتساب والرسالة التلقائية:</h4>
+            <div class="form-group">
+                <label>رقم أو يوزر الواتساب:</label>
+                <input type="text" id="adminWaNumber" placeholder="حط رقم الواتساب أو اليوزر هنا">
+            </div>
+            <div class="form-group">
+                <label>مقدمة الرسالة التلقائية (اختياري):</label>
+                <input type="text" id="adminCustomMsg" placeholder="مثال: السلام عليكم، أريد طلب هذا المنتج من متجر 4X IRAQ">
+            </div>
+            <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ إعدادات الواتساب 💾</button>
+
+            <!-- قسم إضافة المنتجات -->
+            <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
+            <h4 style="font-size: 10pt; margin-bottom: 8px;">➕ إضافة منتج جديد:</h4>
+            
+            <div class="form-group">
+                <label>اسم المنتج:</label>
+                <input type="text" id="newTitle" placeholder="حط اسم المنتج هنا">
+            </div>
+            <div class="form-group">
+                <label>قسم المنتج:</label>
+                <select id="newCategory">
+                    <option value="games">شحن ألعاب</option>
+                    <option value="hardware">قطع حاسبات</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>رابط الصورة:</label>
+                <input type="text" id="newImage" placeholder="حط رابط صورة المنتج هنا">
+            </div>
+            <div class="form-group">
+                <label>نوع / فئة المنتج:</label>
+                <input type="text" id="newPkgName" placeholder="مثال: قطعة واحدة أو 60 UC">
+            </div>
+            <div class="form-group">
+                <label>سعر المنتج:</label>
+                <input type="text" id="newPkgPrice" placeholder="حط سعر المنتج هنا (مثال: 15000)">
+            </div>
+            <button class="buy-action-btn" style="background:var(--az-dark); color:white; margin-bottom: 15px;" onclick="addNewProduct()">إضافة المنتج للمتجر</button>
+
+            <h4 style="font-size: 10pt; margin-bottom: 8px;">🗑️ المنتجات الحالية (حذف):</h4>
+            <div id="adminProductsList" style="max-height: 180px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script>
+        // كلمة المرور الجديدة الخاصة بك
+        const ADMIN_PASSWORD = "xx4xx";
+
+        let currentQty = 1;
+
+        let socialLinks = JSON.parse(localStorage.getItem('4x_social_links')) || {
+            whatsapp: "4xalix4",
+            customMsg: "مرحباً متجر 4X IRAQ، أريد شراء المنتج التالي:"
+        };
+
+        let storeData = JSON.parse(localStorage.getItem('4x_store_data')) || [
+            {
+                id: "pubg", category: "games",
+                title: "شدات ببجي موبايل (PUBG Mobile UC)",
+                image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500",
+                packages: [{ name: "60 UC", price: "1,500 IQD" }]
+            }
+        ];
+
+        let selectedItem = null;
+        let selectedPkg = null;
+
+        function formatPriceToIQD(rawPrice) {
+            if (!rawPrice) return "";
+            let cleanDigits = rawPrice.toString().replace(/[^0-9]/g, '');
+            if (!cleanDigits) return rawPrice;
+            let formattedNumber = Number(cleanDigits).toLocaleString('en-US');
+            return `${formattedNumber} IQD`;
+        }
+
+        function renderProducts(items) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+            if(items.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777; padding:20px;">لا توجد منتجات متوفرة حالياً.</p>';
+                return;
+            }
+            items.forEach(item => {
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <img src="${item.image}" class="product-img" alt="${item.title}" onerror="this.src='https://via.placeholder.com/200?text=4X+IRAQ'">
+                        <div class="product-title">${item.title}</div>
+                        <div class="product-price">${item.packages[0] ? item.packages[0].price : ''}</div>
+                        <button class="buy-action-btn" onclick="openModal('${item.id}')">شراء الآن 🛒</button>
+                    </div>`;
+            });
+        }
+
+        function filterCategory(cat) {
+            document.getElementById('sectionTitle').innerText = cat === 'games' ? 'قسم شحن الألعاب' : (cat === 'hardware' ? 'قسم قطع الحاسبات وهاردوير' : 'جميع المنتجات والخدمات');
+            if (cat === 'all') {
+                renderProducts(storeData);
+            } else {
+                const filtered = storeData.filter(i => i.category === cat);
+                renderProducts(filtered);
+            }
+        }
+
+        function openModal(itemId) {
+            selectedItem = storeData.find(i => i.id === itemId);
+            selectedPkg = null;
+            currentQty = 1;
+            document.getElementById('qtyDisplay').innerText = currentQty;
+
+            document.getElementById('modalTitle').innerText = selectedItem.title;
+            const pkgList = document.getElementById('modalPackagesList');
+            pkgList.innerHTML = '';
+
+            selectedItem.packages.forEach((pkg, index) => {
+                pkgList.innerHTML += `
+                    <div class="modal-pkg-item ${index === 0 ? 'selected' : ''}" onclick="selectPkg(this, '${pkg.name}', '${pkg.price}')">
+                        <span><strong>${pkg.name}</strong></span>
+                        <span class="pkg-p">${pkg.price}</span>
+                    </div>`;
+            });
+
+            if(selectedItem.packages.length > 0) {
+                selectPkg(pkgList.children[0], selectedItem.packages[0].name, selectedItem.packages[0].price);
+            }
+
+            document.getElementById('buyModal').style.display = 'flex';
+        }
+
+        function changeQuantity(change) {
+            currentQty += change;
+            if (currentQty < 1) currentQty = 1;
+            document.getElementById('qtyDisplay').innerText = currentQty;
+            if (selectedPkg) {
+                updateWaLink();
+            }
+        }
+
+        function selectPkg(el, name, price) {
+            document.querySelectorAll('.modal-pkg-item').forEach(e => e.classList.remove('selected'));
+            if(el) el.classList.add('selected');
+            selectedPkg = { name, price };
+            updateWaLink();
+        }
+
+        function updateWaLink() {
+            const headerText = socialLinks.customMsg || "مرحباً، أريد طلب هذا المنتج:";
+            const fullMsg = `${headerText}\n\n🎮 المنتج: ${selectedItem.title}\n📦 الفئة/النوع: ${selectedPkg.name}\n🔢 الكمية المطلوبة: (${currentQty})\n💰 السعر الفردي: ${selectedPkg.price}\n💳 طريقة الدفع: الماستر كارد / كاش مع المندوب عند الاستلام`;
+            
+            const cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
+            document.getElementById('waOrderBtn').href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(fullMsg)}`;
+        }
+
+        function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
+
+        // فتح لوحة الأدمن عند النقر على اسم المتجر (4X IRAQ)
+        function checkAdminPassword() {
+            const pwd = prompt("أدخل كلمة المرور السرية للوصول إلى لوحة التعديل:");
+            if (pwd === ADMIN_PASSWORD) {
+                document.getElementById('adminWaNumber').value = '';
+                document.getElementById('adminCustomMsg').value = '';
+                document.getElementById('newTitle').value = '';
+                document.getElementById('newImage').value = '';
+                document.getElementById('newPkgName').value = '';
+                document.getElementById('newPkgPrice').value = '';
+
+                renderAdminList();
+                document.getElementById('adminModal').style.display = 'flex';
+            } else if (pwd !== null) {
+                alert("كلمة المرور غير صحيحة!");
+            }
+        }
+
+        function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+
+        function saveSocialLinks() {
+            const wa = document.getElementById('adminWaNumber').value.trim();
+            const customMsg = document.getElementById('adminCustomMsg').value.trim();
+
+            if (!wa) {
+                alert("يرجى كتابة رقم أو يوزر الواتساب الخاص بك!");
+                return;
+            }
+
+            socialLinks = { 
+                whatsapp: wa, 
+                customMsg: customMsg || "مرحباً، أريد طلب هذا المنتج:" 
+            };
+            localStorage.setItem('4x_social_links', JSON.stringify(socialLinks));
+            alert("تم حفظ إعدادات الواتساب والرسالة التلقائية بنجاح! 💾");
+        }
+
+        function renderAdminList() {
+            const list = document.getElementById('adminProductsList');
+            list.innerHTML = '';
+            storeData.forEach(item => {
+                list.innerHTML += `
+                    <div class="admin-product-row">
+                        <span>${item.title}</span>
+                        <button class="del-btn" onclick="deleteProduct('${item.id}')">حذف</button>
+                    </div>`;
+            });
+        }
+
+        function addNewProduct() {
+            const title = document.getElementById('newTitle').value.trim();
+            const category = document.getElementById('newCategory').value;
+            const image = document.getElementById('newImage').value.trim() || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500';
+            const pkgName = document.getElementById('newPkgName').value.trim();
+            const rawPkgPrice = document.getElementById('newPkgPrice').value.trim();
+
+            if(!title || !pkgName || !rawPkgPrice) {
+                alert('يرجى ملء كافة الحقول المخصصة للمنتج!');
+                return;
+            }
+
+            const pkgPrice = formatPriceToIQD(rawPkgPrice);
+
+            const newId = 'item_' + Date.now();
+            storeData.push({
+                id: newId,
+                category: category,
+                title: title,
+                image: image,
+                packages: [{ name: pkgName, price: pkgPrice }]
+            });
+
+            localStorage.setItem('4x_store_data', JSON.stringify(storeData));
+            renderProducts(storeData);
+            renderAdminList();
+
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newImage').value = '';
+            document.getElementById('n
