@@ -6,7 +6,6 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    
     <title>4X IRAQ | المتجر الشامل للألعاب وقطع الحاسبات</title>
     <style>
         :root {
@@ -24,7 +23,6 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; text-align: right; }
-
         body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; }
 
         header {
@@ -33,7 +31,6 @@
             justify-content: space-between; flex-wrap: wrap; gap: 15px;
         }
 
-        /* اللوجو يعمل كزر مخفي للوحة الأدمن */
         .logo-area { 
             font-size: 18pt; font-weight: bold; color: var(--white); 
             display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;
@@ -100,7 +97,6 @@
             border-radius: 50%; font-size: 14pt; font-weight: bold; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
-        .quantity-btn:hover { background: var(--az-yellow-hover); }
         .quantity-number { font-size: 12pt; font-weight: bold; color: var(--az-dark); }
 
         .payment-info-box {
@@ -126,7 +122,6 @@
 <body>
 
     <header>
-        <!-- الضغط على اسم المتجر يفتح لوحة التحكم -->
         <div class="logo-area" onclick="checkAdminPassword()">4X <span>IRAQ</span> 🛒</div>
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="ابحث عن منتج..." onkeyup="searchProducts()">
@@ -145,7 +140,7 @@
         <div class="products-grid" id="productsGrid"></div>
     </div>
 
-    <!-- نافذة الشراء والتواصل -->
+    <!-- نافذة الشراء -->
     <div class="modal-overlay" id="buyModal">
         <div class="modal-box">
             <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -171,20 +166,20 @@
         </div>
     </div>
 
-    <!-- نافذة لوحة التحكم (الأدمن) -->
+    <!-- نافذة التحكم للأدمن -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-box" style="max-width: 500px;">
             <span class="close-modal" onclick="closeAdminModal()">&times;</span>
             <h3>⚙️ لوحة التحكم وإدارة المتجر</h3>
             
             <hr style="margin: 10px 0; border:0; border-top:1px solid #ddd;">
-            <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">💬 إعدادات الواتساب والرسالة التلقائية:</h4>
+            <h4 style="font-size: 10pt; margin-bottom: 8px; color: var(--az-dark);">💬 إعدادات الواتساب:</h4>
             <div class="form-group">
                 <label>رقم أو يوزر الواتساب:</label>
                 <input type="text" id="adminWaNumber" placeholder="حط رقم الواتساب أو اليوزر هنا">
             </div>
             <div class="form-group">
-                <label>مقدمة الرسالة التلقائية (اختياري):</label>
+                <label>مقدمة الرسالة التلقائية:</label>
                 <input type="text" id="adminCustomMsg" placeholder="مثال: السلام عليكم، أريد طلب هذا المنتج من متجر 4X IRAQ">
             </div>
             <button class="buy-action-btn" style="background:var(--whatsapp); color:white; margin-bottom: 15px;" onclick="saveSocialLinks()">حفظ إعدادات الواتساب 💾</button>
@@ -221,16 +216,15 @@
             <div id="adminProductsList" style="max-height: 180px; overflow-y: auto;"></div>
 
             <hr style="margin: 15px 0; border:0; border-top:1px solid #ddd;">
-            <button class="del-btn" style="width: 100%; padding: 10px; font-weight: bold;" onclick="resetStoreCache()">🔄 إعادة ضبط وتصفير البيانات القديمة</button>
+            <button class="del-btn" style="width: 100%; padding: 10px; font-weight: bold;" onclick="resetStoreCache()">🔄 إعادة ضبط وتصفير الذاكرة</button>
         </div>
     </div>
 
     <script>
-        const ADMIN_PASSWORD = "xx4xx";
-        let currentQty = 1;
+        var ADMIN_PASSWORD = "xx4xx";
+        var currentQty = 1;
 
-        // منتجات افتراضية أساسية للمتجر
-        const defaultProducts = [
+        var defaultProducts = [
             {
                 id: "pubg", category: "games",
                 title: "شدات ببجي موبايل (PUBG Mobile UC)",
@@ -245,51 +239,50 @@
             }
         ];
 
-        let socialLinks = { whatsapp: "4xalix4", customMsg: "مرحباً متجر 4X IRAQ، أريد شراء المنتج التالي:" };
-        let storeData = defaultProducts;
+        var socialLinks = { whatsapp: "4xalix4", customMsg: "مرحباً متجر 4X IRAQ، أريد شراء المنتج التالي:" };
+        var storeData = defaultProducts;
 
-        // تحميل البيانات بأمان بدون أخطاء
         try {
-            const savedLinks = localStorage.getItem('4x_social_links');
+            var savedLinks = localStorage.getItem('4x_social_links');
             if (savedLinks) socialLinks = JSON.parse(savedLinks);
 
-            const savedData = localStorage.getItem('4x_store_data');
+            var savedData = localStorage.getItem('4x_store_data');
             if (savedData) {
-                const parsed = JSON.parse(savedData);
+                var parsed = JSON.parse(savedData);
                 if (Array.isArray(parsed) && parsed.length > 0) storeData = parsed;
             }
         } catch (e) {
-            console.log("إعادة ضبط البيانات الحافظية");
             storeData = defaultProducts;
         }
 
-        let selectedItem = null;
-        let selectedPkg = null;
+        var selectedItem = null;
+        var selectedPkg = null;
 
         function formatPriceToIQD(rawPrice) {
             if (!rawPrice) return "";
-            let cleanDigits = rawPrice.toString().replace(/[^0-9]/g, '');
+            var cleanDigits = rawPrice.toString().replace(/[^0-9]/g, '');
             if (!cleanDigits) return rawPrice;
             return Number(cleanDigits).toLocaleString('en-US') + " IQD";
         }
 
         function renderProducts(items) {
-            const grid = document.getElementById('productsGrid');
+            var grid = document.getElementById('productsGrid');
             if (!grid) return;
             grid.innerHTML = '';
             if (!items || items.length === 0) {
                 grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777; padding:20px;">لا توجد منتجات متوفرة حالياً.</p>';
                 return;
             }
-            items.forEach(function(item) {
-                grid.innerHTML += `
-                    <div class="product-card">
-                        <img src="${item.image}" class="product-img" alt="${item.title}" onerror="this.src='https://via.placeholder.com/200?text=4X+IRAQ'">
-                        <div class="product-title">${item.title}</div>
-                        <div class="product-price">${item.packages && item.packages[0] ? item.packages[0].price : ''}</div>
-                        <button class="buy-action-btn" onclick="openModal('${item.id}')">شراء الآن 🛒</button>
-                    </div>`;
-            });
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                var priceText = (item.packages && item.packages[0]) ? item.packages[0].price : '';
+                grid.innerHTML += '<div class="product-card">' +
+                    '<img src="' + item.image + '" class="product-img" alt="' + item.title + '" onerror="this.src=\'https://via.placeholder.com/200?text=4X+IRAQ\'">' +
+                    '<div class="product-title">' + item.title + '</div>' +
+                    '<div class="product-price">' + priceText + '</div>' +
+                    '<button class="buy-action-btn" onclick="openModal(\'' + item.id + '\')">شراء الآن 🛒</button>' +
+                    '</div>';
+            }
         }
 
         function filterCategory(cat) {
@@ -297,13 +290,21 @@
             if (cat === 'all') {
                 renderProducts(storeData);
             } else {
-                const filtered = storeData.filter(function(i) { return i.category === cat; });
+                var filtered = [];
+                for (var i = 0; i < storeData.length; i++) {
+                    if (storeData[i].category === cat) filtered.push(storeData[i]);
+                }
                 renderProducts(filtered);
             }
         }
 
         function openModal(itemId) {
-            selectedItem = storeData.find(function(i) { return i.id === itemId; });
+            for (var i = 0; i < storeData.length; i++) {
+                if (storeData[i].id === itemId) {
+                    selectedItem = storeData[i];
+                    break;
+                }
+            }
             if (!selectedItem) return;
             
             selectedPkg = null;
@@ -311,18 +312,19 @@
             document.getElementById('qtyDisplay').innerText = currentQty;
             document.getElementById('modalTitle').innerText = selectedItem.title;
             
-            const pkgList = document.getElementById('modalPackagesList');
+            var pkgList = document.getElementById('modalPackagesList');
             pkgList.innerHTML = '';
 
-            selectedItem.packages.forEach(function(pkg, index) {
-                pkgList.innerHTML += `
-                    <div class="modal-pkg-item ${index === 0 ? 'selected' : ''}" onclick="selectPkg(this, '${pkg.name}', '${pkg.price}')">
-                        <span><strong>${pkg.name}</strong></span>
-                        <span class="pkg-p">${pkg.price}</span>
-                    </div>`;
-            });
+            for (var j = 0; j < selectedItem.packages.length; j++) {
+                var pkg = selectedItem.packages[j];
+                var isSel = (j === 0) ? 'selected' : '';
+                pkgList.innerHTML += '<div class="modal-pkg-item ' + isSel + '" onclick="selectPkg(this, \'' + pkg.name + '\', \'' + pkg.price + '\')">' +
+                    '<span><strong>' + pkg.name + '</strong></span>' +
+                    '<span class="pkg-p">' + pkg.price + '</span>' +
+                    '</div>';
+            }
 
-            if(selectedItem.packages.length > 0) {
+            if (selectedItem.packages.length > 0) {
                 selectPkg(pkgList.children[0], selectedItem.packages[0].name, selectedItem.packages[0].price);
             }
 
@@ -337,23 +339,24 @@
         }
 
         function selectPkg(el, name, price) {
-            document.querySelectorAll('.modal-pkg-item').forEach(function(e) { e.classList.remove('selected'); });
-            if(el) el.classList.add('selected');
+            var items = document.querySelectorAll('.modal-pkg-item');
+            for (var i = 0; i < items.length; i++) items[i].classList.remove('selected');
+            if (el) el.classList.add('selected');
             selectedPkg = { name: name, price: price };
             updateWaLink();
         }
 
         function updateWaLink() {
-            const headerText = socialLinks.customMsg || "مرحباً، أريد طلب هذا المنتج:";
-            const fullMsg = headerText + "\n\n🎮 المنتج: " + selectedItem.title + "\n📦 الفئة/النوع: " + selectedPkg.name + "\n🔢 الكمية المطلوبة: (" + currentQty + ")\n💰 السعر الفردي: " + selectedPkg.price + "\n💳 طريقة الدفع: الماستر كارد / كاش مع المندوب عند الاستلام";
-            const cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
+            var headerText = socialLinks.customMsg || "مرحباً، أريد طلب هذا المنتج:";
+            var fullMsg = headerText + "\n\n🎮 المنتج: " + selectedItem.title + "\n📦 الفئة/النوع: " + selectedPkg.name + "\n🔢 الكمية المطلوبة: (" + currentQty + ")\n💰 السعر الفردي: " + selectedPkg.price + "\n💳 طريقة الدفع: الماستر كارد / كاش مع المندوب عند الاستلام";
+            var cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
             document.getElementById('waOrderBtn').href = "https://wa.me/" + cleanWa + "?text=" + encodeURIComponent(fullMsg);
         }
 
         function closeModal() { document.getElementById('buyModal').style.display = 'none'; }
 
         function checkAdminPassword() {
-            const pwd = prompt("أدخل كلمة المرور السرية للوصول إلى لوحة التعديل:");
+            var pwd = prompt("أدخل كلمة المرور السرية للوصول إلى لوحة التعديل:");
             if (pwd === ADMIN_PASSWORD) {
                 document.getElementById('adminWaNumber').value = '';
                 document.getElementById('adminCustomMsg').value = '';
@@ -372,8 +375,8 @@
         function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
 
         function saveSocialLinks() {
-            const wa = document.getElementById('adminWaNumber').value.trim();
-            const customMsg = document.getElementById('adminCustomMsg').value.trim();
+            var wa = document.getElementById('adminWaNumber').value.trim();
+            var customMsg = document.getElementById('adminCustomMsg').value.trim();
 
             if (!wa) {
                 alert("يرجى كتابة رقم أو يوزر الواتساب الخاص بك!");
@@ -386,18 +389,18 @@
         }
 
         function renderAdminList() {
-            const list = document.getElementById('adminProductsList');
+            var list = document.getElementById('adminProductsList');
             list.innerHTML = '';
-            storeData.forEach(function(item) {
-                list.innerHTML += `
-                    <div class="admin-product-row">
-                        <span>${item.title}</span>
-                        <button class="del-btn" onclick="deleteProduct('${item.id}')">حذف</button>
-                    </div>`;
-            });
+            for (var i = 0; i < storeData.length; i++) {
+                var item = storeData[i];
+                list.innerHTML += '<div class="admin-product-row">' +
+                    '<span>' + item.title + '</span>' +
+                    '<button class="del-btn" onclick="deleteProduct(\'' + item.id + '\')">حذف</button>' +
+                    '</div>';
+            }
         }
 
         function addNewProduct() {
-            const title = document.getElementById('newTitle').value.trim();
-            const category = document.getElementById('newCategory').value;
-            const image = document.getElementById('newImage').value.trim() || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=5
+            var title = document.getElementById('newTitle').value.trim();
+            var category = document.getElementById('newCategory').value;
+            var image 
