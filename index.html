@@ -33,6 +33,7 @@
             justify-content: space-between; flex-wrap: wrap; gap: 15px;
         }
 
+        /* اللوجو يعمل كزر مخفي للوحة الأدمن */
         .logo-area { 
             font-size: 18pt; font-weight: bold; color: var(--white); 
             display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;
@@ -125,7 +126,8 @@
 <body>
 
     <header>
-        <div class="logo-area" onclick="checkAdminPassword()" title="4X IRAQ">4X <span>IRAQ</span> 🛒</div>
+        <!-- الضغط على اسم المتجر يفتح لوحة التحكم -->
+        <div class="logo-area" onclick="checkAdminPassword()">4X <span>IRAQ</span> 🛒</div>
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="ابحث عن منتج..." onkeyup="searchProducts()">
             <button class="search-btn">🔍</button>
@@ -169,7 +171,7 @@
         </div>
     </div>
 
-    <!-- نافذة لوحة التحكم (الأدمن المخفية) -->
+    <!-- نافذة لوحة التحكم (الأدمن) -->
     <div class="modal-overlay" id="adminModal">
         <div class="modal-box" style="max-width: 500px;">
             <span class="close-modal" onclick="closeAdminModal()">&times;</span>
@@ -225,22 +227,41 @@
 
     <script>
         const ADMIN_PASSWORD = "xx4xx";
-
         let currentQty = 1;
 
-        let socialLinks = JSON.parse(localStorage.getItem('4x_social_links')) || {
-            whatsapp: "4xalix4",
-            customMsg: "مرحباً متجر 4X IRAQ، أريد شراء المنتج التالي:"
-        };
-
-        let storeData = JSON.parse(localStorage.getItem('4x_store_data')) || [
+        // منتجات افتراضية أساسية للمتجر
+        const defaultProducts = [
             {
                 id: "pubg", category: "games",
                 title: "شدات ببجي موبايل (PUBG Mobile UC)",
                 image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500",
                 packages: [{ name: "60 UC", price: "1,500 IQD" }]
+            },
+            {
+                id: "gpu_rx580", category: "hardware",
+                title: "كرت شاشة AMD Radeon RX 580 8GB",
+                image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=500",
+                packages: [{ name: "نسخة ممتازة", price: "85,000 IQD" }]
             }
         ];
+
+        let socialLinks = { whatsapp: "4xalix4", customMsg: "مرحباً متجر 4X IRAQ، أريد شراء المنتج التالي:" };
+        let storeData = defaultProducts;
+
+        // تحميل البيانات بأمان بدون أخطاء
+        try {
+            const savedLinks = localStorage.getItem('4x_social_links');
+            if (savedLinks) socialLinks = JSON.parse(savedLinks);
+
+            const savedData = localStorage.getItem('4x_store_data');
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (Array.isArray(parsed) && parsed.length > 0) storeData = parsed;
+            }
+        } catch (e) {
+            console.log("إعادة ضبط البيانات الحافظية");
+            storeData = defaultProducts;
+        }
 
         let selectedItem = null;
         let selectedPkg = null;
@@ -249,18 +270,18 @@
             if (!rawPrice) return "";
             let cleanDigits = rawPrice.toString().replace(/[^0-9]/g, '');
             if (!cleanDigits) return rawPrice;
-            let formattedNumber = Number(cleanDigits).toLocaleString('en-US');
-            return formattedNumber + " IQD";
+            return Number(cleanDigits).toLocaleString('en-US') + " IQD";
         }
 
         function renderProducts(items) {
             const grid = document.getElementById('productsGrid');
+            if (!grid) return;
             grid.innerHTML = '';
-            if(!items || items.length === 0) {
+            if (!items || items.length === 0) {
                 grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#777; padding:20px;">لا توجد منتجات متوفرة حالياً.</p>';
                 return;
             }
-            items.forEach(item => {
+            items.forEach(function(item) {
                 grid.innerHTML += `
                     <div class="product-card">
                         <img src="${item.image}" class="product-img" alt="${item.title}" onerror="this.src='https://via.placeholder.com/200?text=4X+IRAQ'">
@@ -276,22 +297,24 @@
             if (cat === 'all') {
                 renderProducts(storeData);
             } else {
-                const filtered = storeData.filter(i => i.category === cat);
+                const filtered = storeData.filter(function(i) { return i.category === cat; });
                 renderProducts(filtered);
             }
         }
 
         function openModal(itemId) {
-            selectedItem = storeData.find(i => i.id === itemId);
+            selectedItem = storeData.find(function(i) { return i.id === itemId; });
+            if (!selectedItem) return;
+            
             selectedPkg = null;
             currentQty = 1;
             document.getElementById('qtyDisplay').innerText = currentQty;
-
             document.getElementById('modalTitle').innerText = selectedItem.title;
+            
             const pkgList = document.getElementById('modalPackagesList');
             pkgList.innerHTML = '';
 
-            selectedItem.packages.forEach((pkg, index) => {
+            selectedItem.packages.forEach(function(pkg, index) {
                 pkgList.innerHTML += `
                     <div class="modal-pkg-item ${index === 0 ? 'selected' : ''}" onclick="selectPkg(this, '${pkg.name}', '${pkg.price}')">
                         <span><strong>${pkg.name}</strong></span>
@@ -310,22 +333,19 @@
             currentQty += change;
             if (currentQty < 1) currentQty = 1;
             document.getElementById('qtyDisplay').innerText = currentQty;
-            if (selectedPkg) {
-                updateWaLink();
-            }
+            if (selectedPkg) updateWaLink();
         }
 
         function selectPkg(el, name, price) {
-            document.querySelectorAll('.modal-pkg-item').forEach(e => e.classList.remove('selected'));
+            document.querySelectorAll('.modal-pkg-item').forEach(function(e) { e.classList.remove('selected'); });
             if(el) el.classList.add('selected');
-            selectedPkg = { name, price };
+            selectedPkg = { name: name, price: price };
             updateWaLink();
         }
 
         function updateWaLink() {
             const headerText = socialLinks.customMsg || "مرحباً، أريد طلب هذا المنتج:";
             const fullMsg = headerText + "\n\n🎮 المنتج: " + selectedItem.title + "\n📦 الفئة/النوع: " + selectedPkg.name + "\n🔢 الكمية المطلوبة: (" + currentQty + ")\n💰 السعر الفردي: " + selectedPkg.price + "\n💳 طريقة الدفع: الماستر كارد / كاش مع المندوب عند الاستلام";
-            
             const cleanWa = (socialLinks.whatsapp || "4xalix4").replace('+', '').trim();
             document.getElementById('waOrderBtn').href = "https://wa.me/" + cleanWa + "?text=" + encodeURIComponent(fullMsg);
         }
@@ -360,18 +380,15 @@
                 return;
             }
 
-            socialLinks = { 
-                whatsapp: wa, 
-                customMsg: customMsg || "مرحباً، أريد طلب هذا المنتج:" 
-            };
+            socialLinks = { whatsapp: wa, customMsg: customMsg || "مرحباً، أريد طلب هذا المنتج:" };
             localStorage.setItem('4x_social_links', JSON.stringify(socialLinks));
-            alert("تم حفظ إعدادات الواتساب والرسالة التلقائية بنجاح! 💾");
+            alert("تم حفظ إعدادات الواتساب بنجاح! 💾");
         }
 
         function renderAdminList() {
             const list = document.getElementById('adminProductsList');
             list.innerHTML = '';
-            storeData.forEach(item => {
+            storeData.forEach(function(item) {
                 list.innerHTML += `
                     <div class="admin-product-row">
                         <span>${item.title}</span>
@@ -383,29 +400,4 @@
         function addNewProduct() {
             const title = document.getElementById('newTitle').value.trim();
             const category = document.getElementById('newCategory').value;
-            const image = document.getElementById('newImage').value.trim() || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500';
-            const pkgName = document.getElementById('newPkgName').value.trim();
-            const rawPkgPrice = document.getElementById('newPkgPrice').value.trim();
-
-            if(!title || !pkgName || !rawPkgPrice) {
-                alert('يرجى ملء كافة الحقول المخصصة للمنتج!');
-                return;
-            }
-
-            const pkgPrice = formatPriceToIQD(rawPkgPrice);
-
-            const newId = 'item_' + Date.now();
-            storeData.push({
-                id: newId,
-                category: category,
-                title: title,
-                image: image,
-                packages: [{ name: pkgName, price: pkgPrice }]
-            });
-
-            localStorage.setItem('4x_store_data', JSON.stringify(storeData));
-            renderProducts(storeData);
-            renderAdminList();
-
-            document.getElementById('newTitle').value = '';
-            document.getElementById('newImage').value = 
+            const image = document.getElementById('newImage').value.trim() || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=5
