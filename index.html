@@ -27,7 +27,7 @@ header{background:var(--dark);color:var(--white);padding:10px 20px;display:flex;
 .product-price{font-size:11pt;font-weight:bold;color:#B12704;margin-bottom:10px;direction:ltr;text-align:right;}
 .buy-btn{background:var(--yellow);border:none;padding:8px;border-radius:20px;font-weight:bold;cursor:pointer;width:100%;margin-top:auto;}
 .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:3000;display:none;justify-content:center;align-items:center;padding:15px;}
-.modal-box{background:var(--white);border-radius:8px;width:100%;max-width:400px;padding:20px;position:relative;max-height:90vh;overflow-y:auto;}
+.modal-box{background:var(--white);border-radius:8px;width:100%;max-width:420px;padding:20px;position:relative;max-height:90vh;overflow-y:auto;}
 .close-btn{position:absolute;top:10px;left:15px;font-size:16pt;cursor:pointer;color:#565959;}
 .pkg-item{border:1px solid #d5d9d9;padding:8px 12px;border-radius:6px;display:flex;justify-content:space-between;cursor:pointer;background:#fafafa;margin-bottom:8px;}
 .pkg-item.selected{border-color:#B12704;background:#fff8f5;}
@@ -41,6 +41,8 @@ header{background:var(--dark);color:var(--white);padding:10px 20px;display:flex;
 .form-group label{display:block;font-size:8.5pt;color:#565959;margin-bottom:3px;}
 .form-group input,.form-group select{width:100%;padding:8px;border:1px solid #d5d9d9;border-radius:4px;outline:none;}
 .admin-row{display:flex;justify-content:space-between;align-items:center;background:#f8f9fa;padding:6px 10px;border:1px solid #ddd;border-radius:4px;margin-bottom:5px;font-size:9pt;}
+.admin-actions{display:flex;gap:5px;}
+.edit-btn{background:#007bff;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;}
 .del-btn{background:#cc0000;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;}
 </style>
 </head>
@@ -91,9 +93,11 @@ header{background:var(--dark);color:var(--white);padding:10px 20px;display:flex;
 <label>الرسالة التلقائية:</label>
 <input type="text" id="adminCustomMsg" placeholder="مقدمة الرسالة">
 </div>
-<button class="buy-btn" style="background:var(--wa);color:#fff;margin-bottom:15px;" onclick="saveSocialLinks()">حفظ الإعدادات 💾</button>
+<button class="buy-btn" style="background:var(--wa);color:#fff;margin-bottom:15px;" onclick="saveSocialLinks()">حفظ إعدادات الواتساب 💾</button>
 <hr style="margin:10px 0;border:0;border-top:1px solid #ddd;">
-<h4 style="font-size:9.5pt;margin-bottom:8px;">➕ إضافة منتج جديد:</h4>
+
+<h4 id="formHeaderTitle" style="font-size:9.5pt;margin-bottom:8px;">➕ إضافة منتج جديد:</h4>
+<input type="hidden" id="editingProductId" value="">
 <div class="form-group">
 <label>اسم المنتج:</label>
 <input type="text" id="newTitle">
@@ -117,8 +121,9 @@ header{background:var(--dark);color:var(--white);padding:10px 20px;display:flex;
 <label>السعر:</label>
 <input type="text" id="newPkgPrice" placeholder="مثال: 25 أو 15000">
 </div>
-<button class="buy-btn" style="background:var(--dark);color:#fff;margin-bottom:15px;" onclick="addNewProduct()">إضافة المنتج</button>
-<h4 style="font-size:9.5pt;margin-bottom:8px;">🗑️ إدارة المنتجات:</h4>
+<button id="saveProductBtn" class="buy-btn" style="background:var(--dark);color:#fff;margin-bottom:15px;" onclick="addNewProduct()">حفظ المنتج</button>
+
+<h4 style="font-size:9.5pt;margin-bottom:8px;">📝 المنتجات الحالية (تعديل / حذف):</h4>
 <div id="adminProductsList" style="max-height:150px;overflow-y:auto;"></div>
 <button class="del-btn" style="width:100%;padding:8px;margin-top:10px;" onclick="resetStoreCache()">🔄 إعادة ضبط وتصفير البيانات</button>
 </div>
@@ -141,7 +146,9 @@ else{localStorage.setItem('4x_store_data',JSON.stringify(defaultProducts));}
 }catch(e){storeData=defaultProducts;}
 var selectedItem=null;
 var selectedPkg=null;
+
 function formatPriceToIQD(r){if(!r)return "";var c=r.toString().replace(/[^0-9]/g,'');return c?Number(c).toLocaleString('en-US')+" IQD":r;}
+
 function renderProducts(items){
 var grid=document.getElementById('productsGrid');if(!grid)return;grid.innerHTML='';
 if(!items||items.length===0){grid.innerHTML='<p style="grid-column:1/-1;text-align:center;color:#777;padding:20px;">لا توجد منتجات حالياً.</p>';return;}
@@ -150,12 +157,14 @@ var item=items[i];var p=(item.packages&&item.packages[0])?item.packages[0].price
 grid.innerHTML+='<div class="product-card"><img src="'+item.image+'" class="product-img" onerror="this.src=\'https://via.placeholder.com/200?text=4X+IRAQ\'"><div class="product-title">'+item.title+'</div><div class="product-price">'+p+'</div><button class="buy-btn" onclick="openModal(\''+item.id+'\')">شراء الآن 🛒</button></div>';
 }
 }
+
 function filterCategory(cat){
 var t='جميع المنتجات والخدمات';if(cat==='games')t='قسم شحن الألعاب';if(cat==='hardware')t='قسم قطع الحاسبات';
 document.getElementById('sectionTitle').innerText=t;
 if(cat==='all'){renderProducts(storeData);}
 else{var f=[];for(var i=0;i<storeData.length;i++){if(storeData[i].category===cat)f.push(storeData[i]);}renderProducts(f);}
 }
+
 function openModal(itemId){
 for(var i=0;i<storeData.length;i++){if(storeData[i].id===itemId){selectedItem=storeData[i];break;}}
 if(!selectedItem)return;selectedPkg=null;currentQty=1;
@@ -169,15 +178,18 @@ pkgList.innerHTML+='<div class="pkg-item '+isSel+'" onclick="selectPkg(this,\''+
 if(selectedItem.packages.length>0)selectPkg(pkgList.children[0],selectedItem.packages[0].name,selectedItem.packages[0].price);
 document.getElementById('buyModal').style.display='flex';
 }
+
 function changeQuantity(c){
 currentQty+=c;if(currentQty<1)currentQty=1;
 document.getElementById('qtyDisplay').innerText=currentQty;
 if(selectedPkg)updateWaLink();
 }
+
 function selectPkg(el,name,price){
 var items=document.querySelectorAll('.pkg-item');for(var i=0;i<items.length;i++)items[i].classList.remove('selected');
 if(el)el.classList.add('selected');selectedPkg={name:name,price:price};updateWaLink();
 }
+
 function updateWaLink(){
 var cleanPrice=selectedPkg.price.toString().replace(/[^0-9]/g,'');
 var unitNum=Number(cleanPrice)||0;
@@ -191,13 +203,17 @@ var msg=head+"\n\n🎮 المنتج: "+selectedItem.title+"\n📦 الفئة: "+
 var cleanWa=(socialLinks.whatsapp||"4xalix4").replace('+','').trim();
 document.getElementById('waOrderBtn').href="https://wa.me/"+cleanWa+"?text="+encodeURIComponent(msg);
 }
+
 function closeModal(){document.getElementById('buyModal').style.display='none';}
+
 function checkAdminPassword(){
 var pwd=prompt("كلمة المرور السرية:");
-if(pwd===ADMIN_PASSWORD){renderAdminList();document.getElementById('adminModal').style.display='flex';}
+if(pwd===ADMIN_PASSWORD){clearForm();renderAdminList();document.getElementById('adminModal').style.display='flex';}
 else if(pwd!==null){alert("كلمة المرور خاطئة!");}
 }
+
 function closeAdminModal(){document.getElementById('adminModal').style.display='none';}
+
 function saveSocialLinks(){
 var wa=document.getElementById('adminWaNumber').value.trim();
 var msg=document.getElementById('adminCustomMsg').value.trim();
@@ -206,26 +222,73 @@ socialLinks={whatsapp:wa,customMsg:msg||"مرحباً، أريد طلب هذا �
 localStorage.setItem('4x_social_links',JSON.stringify(socialLinks));
 alert("تم الحفظ بنجاح! 💾");
 }
+
 function renderAdminList(){
 var list=document.getElementById('adminProductsList');list.innerHTML='';
 for(var i=0;i<storeData.length;i++){
-list.innerHTML+='<div class="admin-row"><span>'+storeData[i].title+'</span><button class="del-btn" onclick="deleteProduct(\''+storeData[i].id+'\')">حذف</button></div>';
+var p=storeData[i];
+list.innerHTML+='<div class="admin-row"><span>'+p.title+'</span><div class="admin-actions"><button class="edit-btn" onclick="startEditProduct(\''+p.id+'\')">✏️ تعديل</button><button class="del-btn" onclick="deleteProduct(\''+p.id+'\')">حذف</button></div></div>';
 }
 }
+
+function startEditProduct(id){
+var p=null;
+for(var i=0;i<storeData.length;i++){if(storeData[i].id===id){p=storeData[i];break;}}
+if(!p)return;
+document.getElementById('editingProductId').value=p.id;
+document.getElementById('newTitle').value=p.title;
+document.getElementById('newCategory').value=p.category;
+document.getElementById('newImage').value=p.image;
+if(p.packages&&p.packages[0]){
+document.getElementById('newPkgName').value=p.packages[0].name;
+document.getElementById('newPkgPrice').value=p.packages[0].price;
+}
+document.getElementById('formHeaderTitle').innerText='✏️ تعديل بيانات المنتج:';
+document.getElementById('saveProductBtn').innerText='حفظ التعديلات 💾';
+}
+
+function clearForm(){
+document.getElementById('editingProductId').value='';
+document.getElementById('newTitle').value='';
+document.getElementById('newImage').value='';
+document.getElementById('newPkgName').value='';
+document.getElementById('newPkgPrice').value='';
+document.getElementById('formHeaderTitle').innerText='➕ إضافة منتج جديد:';
+document.getElementById('saveProductBtn').innerText='حفظ المنتج';
+}
+
 function addNewProduct(){
+var editId=document.getElementById('editingProductId').value;
 var t=document.getElementById('newTitle').value.trim();
 var c=document.getElementById('newCategory').value;
 var img=document.getElementById('newImage').value.trim()||'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500';
 var pkg=document.getElementById('newPkgName').value.trim();
 var p=document.getElementById('newPkgPrice').value.trim();
+
 if(!t||!pkg||!p){alert('ملء جميع الحقول مطلوب!');return;}
-storeData.push({id:'item_'+Date.now(),category:c,title:t,image:img,packages:[{name:pkg,price:formatPriceToIQD(p)}]});
-localStorage.setItem('4x_store_data',JSON.stringify(storeData));
-renderProducts(storeData);renderAdminList();
-document.getElementById('newTitle').value='';document.getElementById('newImage').value='';
-document.getElementById('newPkgName').value='';document.getElementById('newPkgPrice').value='';
-alert('تمت إضافة المنتج!');
+
+if(editId){
+for(var i=0;i<storeData.length;i++){
+if(storeData[i].id===editId){
+storeData[i].title=t;
+storeData[i].category=c;
+storeData[i].image=img;
+storeData[i].packages=[{name:pkg,price:formatPriceToIQD(p)}];
+break;
 }
+}
+alert('تم تحديث المنتج بنجاح! ✏️');
+}else{
+storeData.push({id:'item_'+Date.now(),category:c,title:t,image:img,packages:[{name:pkg,price:formatPriceToIQD(p)}]});
+alert('تمت إضافة المنتج بنجاح!');
+}
+
+localStorage.setItem('4x_store_data',JSON.stringify(storeData));
+renderProducts(storeData);
+renderAdminList();
+clearForm();
+}
+
 function deleteProduct(id){
 if(confirm('هل أنت متأكد من حذف المنتج؟')){
 var temp=[];for(var i=0;i<storeData.length;i++){if(storeData[i].id!==id)temp.push(storeData[i]);}
@@ -233,12 +296,15 @@ storeData=temp;localStorage.setItem('4x_store_data',JSON.stringify(storeData));
 renderProducts(storeData);renderAdminList();
 }
 }
+
 function resetStoreCache(){if(confirm('تصفير ذاكرة المتصفح؟')){localStorage.removeItem('4x_store_data');location.reload();}}
+
 function searchProducts(){
 var q=document.getElementById('searchInput').value.toLowerCase();
 var f=[];for(var i=0;i<storeData.length;i++){if(storeData[i].title.toLowerCase().indexOf(q)!==-1)f.push(storeData[i]);}
 renderProducts(f);
 }
+
 window.onload=function(){renderProducts(storeData);};
 </script>
 </body>
